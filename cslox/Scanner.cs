@@ -72,13 +72,13 @@ class Scanner
                 _line++;
                 break;
             
-            case '"': parseString(); break;
+            case '"': scanString(); break;
 
             default:
                 if (isDigit(c))
-                    parseNumber();
+                    scanNumber();
                 else if (isAlpha(c))
-                    parseIdentifier();
+                    scanIdentifier();
                 else
                     CSLox.Error(_line, $"Unexpected character {c}.");
                 break;
@@ -104,7 +104,7 @@ class Scanner
         {"while", TokenType.WHILE}
     };
     
-    void parseIdentifier()
+    void scanIdentifier()
     {
         while (isAlphaNumeric(peek()))
             advance();
@@ -116,7 +116,7 @@ class Scanner
             addToken(TokenType.IDENTIFIER);
     }
 
-    void parseNumber()
+    void scanNumber()
     {
         while (isDigit(peek()))
             advance();
@@ -133,7 +133,7 @@ class Scanner
         addToken(TokenType.NUMBER, double.Parse(_source.Substring(_start, _current-_start)));
     }
 
-    void parseString()
+    void scanString()
     {
         while (peek() != '"' && !isAtEnd())
         {

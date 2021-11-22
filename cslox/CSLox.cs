@@ -6,12 +6,22 @@ static class CSLox
 
     static void Main(string[] args)
     {
+        /*
         if (args.Length > 1)
             Console.WriteLine("Usage: cslox [script]");
         else if (args.Length == 1)
             runFile(args[0]);
         else
             runPrompt();
+        */
+
+        var newExpr = new BinarySyntax(
+            new UnarySyntax(
+                new Token(TokenType.MINUS, "-", null, 1),
+                new LiteralSyntax(123)),
+            new Token(TokenType.STAR, "*", null, 1),
+            new GroupingSyntax(new LiteralSyntax(45.67)));
+        Console.WriteLine(new ASTPrinter().Print(newExpr));
     }
     
     static void runFile(string s)
