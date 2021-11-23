@@ -3,17 +3,17 @@ namespace CSLox;
 
 public class ASTPrinter : IExpressionVisitor
 {
-    public string Print(ExpressionSyntax expression) => expression.Accept(this);
+    public string Print(ExpressionSyntax expression) => expression.Accept(this)?.ToString() ?? string.Empty;
 
-    public string VisitBinarySyntax(BinarySyntax binarySyntax) => 
+    public object VisitBinarySyntax(BinarySyntax binarySyntax) => 
         parenthesize(binarySyntax.operatorToken.lexeme, binarySyntax.leftExpression, binarySyntax.rightExpression);
     
-    public string VisitGroupingSyntax(GroupingSyntax groupingSyntax) => 
+    public object VisitGroupingSyntax(GroupingSyntax groupingSyntax) => 
         parenthesize("group", groupingSyntax.expression);
 
-    public string VisitLiteralSyntax(LiteralSyntax literalSyntax) => literalSyntax.literalValue?.ToString() ?? "nil";
+    public object VisitLiteralSyntax(LiteralSyntax literalSyntax) => literalSyntax.literalValue?.ToString() ?? "nil";
 
-    public string VisitUnarySyntax(UnarySyntax unarySyntax) => 
+    public object VisitUnarySyntax(UnarySyntax unarySyntax) => 
         parenthesize(unarySyntax.operatorToken.lexeme, unarySyntax.rightExpression);
 
     string parenthesize(string name, params ExpressionSyntax[] expressionSyntaxes)
