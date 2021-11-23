@@ -1,7 +1,6 @@
-using System.ComponentModel.Design;
-using System.Text.RegularExpressions;
+namespace CSLox;
 
-class Parser
+internal class Parser
 {
     List<Token> _tokens;
     int _current;

@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿namespace CSLox;
 
 static class CSLox
 {
@@ -12,16 +12,6 @@ static class CSLox
             RunFile(args[0]);
         else
             RunPrompt();
-
-        /*
-        var newExpr = new BinarySyntax(
-            new UnarySyntax(
-                new Token(TokenType.MINUS, "-", null, 1),
-                new LiteralSyntax(123)),
-            new Token(TokenType.STAR, "*", null, 1),
-            new GroupingSyntax(new LiteralSyntax(45.67)));
-        Console.WriteLine(new ASTPrinter().Print(newExpr));
-        */
     }
     
     static void RunFile(string s)

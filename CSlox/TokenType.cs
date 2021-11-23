@@ -1,3 +1,5 @@
+namespace CSLox;
+
 public enum TokenType
 {
     // Single-character tokens

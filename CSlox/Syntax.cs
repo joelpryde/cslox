@@ -1,3 +1,5 @@
+namespace CSLox;
+
 public abstract record ExpressionSyntax()
 {
     public abstract string Accept(IExpressionVisitor visitor);

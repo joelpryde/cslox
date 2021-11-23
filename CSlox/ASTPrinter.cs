@@ -1,6 +1,7 @@
 using System.Text;
+namespace CSLox;
 
-class ASTPrinter : IExpressionVisitor
+public class ASTPrinter : IExpressionVisitor
 {
     public string Print(ExpressionSyntax expression) => expression.Accept(this);
 

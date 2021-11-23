@@ -1,6 +1,6 @@
-using System.Data.Common;
+namespace CSLox;
 
-class Scanner
+internal class Scanner
 {
     string _source;
     List<Token> _tokens = new();
