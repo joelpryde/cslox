@@ -2,7 +2,9 @@
 
 static class CSLox
 {
+    static Interpreter _interpreter = new();
     static bool _hadError;
+    static bool _hadRuntimeError;
 
     static void Main(string[] args)
     {
@@ -20,6 +22,8 @@ static class CSLox
         Run(fileContents);
         if (_hadError)
             Environment.Exit(65);
+        if (_hadRuntimeError)
+            Environment.Exit(70);
     }
     
     static void RunPrompt()
@@ -43,8 +47,9 @@ static class CSLox
 
         if (_hadError || expression == null)
             return;
-        
-        Console.WriteLine(new ASTPrinter().Print(expression));
+
+        var output = _interpreter.Interpret(expression);
+        Console.WriteLine(output);
     }
 
     internal static void Error(int line, string message) => Report(line, "", message);
@@ -55,5 +60,11 @@ static class CSLox
     {
         Console.Error.WriteLine($"[line {line}] Error {where} : {message}");
         _hadError = true;
+    }
+
+    public static void RuntimeError(RuntimeError error)
+    {
+        Console.Error.WriteLine($"{error.Message} \n[line {error._token.line}]");
+        _hadRuntimeError = true;
     }
 }
