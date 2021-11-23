@@ -6,15 +6,14 @@ static class CSLox
 
     static void Main(string[] args)
     {
-        /*
         if (args.Length > 1)
             Console.WriteLine("Usage: cslox [script]");
         else if (args.Length == 1)
-            runFile(args[0]);
+            RunFile(args[0]);
         else
-            runPrompt();
-        */
+            RunPrompt();
 
+        /*
         var newExpr = new BinarySyntax(
             new UnarySyntax(
                 new Token(TokenType.MINUS, "-", null, 1),
@@ -22,42 +21,45 @@ static class CSLox
             new Token(TokenType.STAR, "*", null, 1),
             new GroupingSyntax(new LiteralSyntax(45.67)));
         Console.WriteLine(new ASTPrinter().Print(newExpr));
+        */
     }
     
-    static void runFile(string s)
+    static void RunFile(string s)
     {
         var fileContents = File.ReadAllText(s);
-        run(fileContents);
+        Run(fileContents);
         if (_hadError)
             Environment.Exit(65);
     }
     
-    static void runPrompt()
+    static void RunPrompt()
     {
         string? line;
         Console.Write(">");;
         while ((line = Console.ReadLine()) != null)
         {
-            run(line);
+            Run(line);
             _hadError = false;
             Console.Write(">");
         }
     }
 
-    static void run(string source)
+    static void Run(string source)
     {
         var scanner = new Scanner(source);
         var tokens = scanner.scanTokens();
+        var parser = new Parser(tokens);
+        var expression = parser.Parse();
+
+        if (_hadError || expression == null)
+            return;
         
-        // for now just print tokens
-        foreach (var token in tokens)
-            Console.WriteLine(token);
+        Console.WriteLine(new ASTPrinter().Print(expression));
     }
 
-    internal static void Error(int line, string message)
-    {
-        Report(line, "", message);
-    }
+    internal static void Error(int line, string message) => Report(line, "", message);
+    internal static void Error(Token token, string message) => 
+        Report(token.line, token.type == TokenType.EOF ? " at end" : $" at '{token.lexeme}`", message);
 
     static void Report(int line, string where, string message)
     {
