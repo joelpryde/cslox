@@ -125,4 +125,18 @@ print x;");
         Assert.Equal(
             @$"10" + System.Environment.NewLine, output);
     }
+    
+    [Fact]
+    public void TestForLoop()
+    {
+        var output = Interpret(
+@"var x = 0;
+for (var i = 0; i < 10; i = i + 1)
+{
+    x = x + 1;
+}
+print x;");
+        Assert.Equal(
+            @$"10" + System.Environment.NewLine, output);
+    }
 }

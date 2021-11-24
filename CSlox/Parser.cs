@@ -82,6 +82,8 @@ internal class Parser
 
     StatementSyntax StatementRule()
     {
+        if (Match(TokenType.FOR))
+            return ForStatementRule();
         if (Match(TokenType.IF))
             return IfStatementRule();
         if (Match(TokenType.PRINT))
@@ -91,6 +93,42 @@ internal class Parser
         if (Match(TokenType.LEFT_BRACE))
             return new BlockStatementSyntax(BlockStatementRule());
         return ExpressionStatementRule();
+    }
+    
+    StatementSyntax ForStatementRule()
+    {
+        Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+
+        StatementSyntax? initializer = null;
+        if (Match(TokenType.SEMICOLON))
+            initializer = null;
+        else if (Match(TokenType.VAR))
+            initializer = VariableDeclarationRule();
+        else
+            initializer = ExpressionStatementRule();
+
+        ExpressionSyntax? condition = null;
+        if (!Check(TokenType.SEMICOLON))
+            condition = ExpressionRule();
+        Consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+        ExpressionSyntax? increment = null;
+        if (!Check((TokenType.RIGHT_PAREN)))
+            increment = ExpressionRule();
+        Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        var body = StatementRule();
+
+        // Construct 'for' syntax by lowering to 'while'
+        if (increment != null)
+            body = new BlockStatementSyntax(new List<StatementSyntax> { body, new ExpressionStatementSyntax(increment) });
+        if (condition == null)
+            condition = new LiteralExpressionSyntax(true);
+        body = new WhileStatementSyntax(condition, body);
+        if (initializer != null)
+            body = new BlockStatementSyntax(new List<StatementSyntax> { initializer, body });
+        
+        return body;
     }
 
     StatementSyntax WhileStatementRule()
