@@ -151,7 +151,7 @@ internal class Scanner
         advance(); // closing "
         
         // Trim quotes
-        var value = _source.Substring(_start + 1, _current - _start - 1);
+        var value = _source.Substring(_start + 1, _current - _start - 2);
         addToken(TokenType.STRING, value);
     }
 

@@ -118,7 +118,7 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
     public object? VisitPrintStatementSyntax(PrintStatementSyntax printStatement)
     {
         var value = Evaluate(printStatement.expression);
-        Console.WriteLine(Stringify(value));
+        CSLox.WriteLine(Stringify(value));
         return null;
     }
 

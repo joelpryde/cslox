@@ -67,4 +67,20 @@ static class CSLox
         Console.Error.WriteLine($"{error.Message} \n[line {error._token.line}]");
         _hadRuntimeError = true;
     }
+    
+    internal static IConsoleWriter s_consoleWriter = new BasicConsoleWriter();
+    public static void WriteLine(string output)
+    {
+        s_consoleWriter.ConsoleWriteLine(output);
+    }
+}
+
+public interface IConsoleWriter
+{
+    void ConsoleWriteLine(string output);
+}
+
+public class BasicConsoleWriter : IConsoleWriter
+{
+    public void ConsoleWriteLine(string output) => Console.WriteLine();
 }
