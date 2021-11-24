@@ -16,7 +16,8 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
             foreach (var statement in statements)
             {
                 var value = Execute(statement);
-                builder.Append(Stringify(value));
+                if (value != null)
+                    builder.Append(Stringify(value));
             }
 
             return builder.ToString();
@@ -117,7 +118,8 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
     public object? VisitPrintStatementSyntax(PrintStatementSyntax printStatement)
     {
         var value = Evaluate(printStatement.expression);
-        return value;
+        Console.WriteLine(Stringify(value));
+        return null;
     }
 
     public object? VisitVariableDeclarationStatementSyntax(VariableDeclarationStatementSyntax variableDeclarationStatement)
@@ -128,6 +130,27 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         
         _environment.Define(variableDeclarationStatement.name.lexeme, value);
         return null;
+    }
+
+    public object? VisitBlockStatementSyntax(BlockStatementSyntax blockStatement)
+    {
+        ExecuteBlock(blockStatement.statements, new Environment(_environment));
+        return null;
+    }
+
+    void ExecuteBlock(List<StatementSyntax> blockStatements, Environment environment)
+    {
+        var previousEnvironment = _environment;
+        try
+        {
+            _environment = environment;
+            foreach (var statement in blockStatements)
+                Execute(statement);
+        }
+        finally
+        {
+            _environment = previousEnvironment;
+        }
     }
 
     string Stringify(object? obj)

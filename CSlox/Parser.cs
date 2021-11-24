@@ -84,9 +84,25 @@ internal class Parser
     {
         if (Match(TokenType.PRINT))
             return PrintStatementRule();
+        if (Match(TokenType.LEFT_BRACE))
+            return new BlockStatementSyntax(BlockStatementRule());
         return ExpressionStatementRule();
     }
-    
+
+    List<StatementSyntax> BlockStatementRule()
+    {
+        var statements = new List<StatementSyntax>();
+        while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+        {
+            var declaration = DeclarationRule();
+            if (declaration != null)
+                statements.Add(declaration);
+        }
+
+        Consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
+    }
+
     StatementSyntax PrintStatementRule()
     {
         var expression = ExpressionRule();
