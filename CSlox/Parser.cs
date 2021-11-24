@@ -86,9 +86,21 @@ internal class Parser
             return IfStatementRule();
         if (Match(TokenType.PRINT))
             return PrintStatementRule();
+        if (Match(TokenType.WHILE))
+            return WhileStatementRule();
         if (Match(TokenType.LEFT_BRACE))
             return new BlockStatementSyntax(BlockStatementRule());
         return ExpressionStatementRule();
+    }
+
+    StatementSyntax WhileStatementRule()
+    {
+        Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+        var condition = ExpressionRule();
+        Consume(TokenType.RIGHT_PAREN, "Expect '(' after condition.");
+        var body = StatementRule();
+
+        return new WhileStatementSyntax(condition, body);
     }
 
     StatementSyntax IfStatementRule()

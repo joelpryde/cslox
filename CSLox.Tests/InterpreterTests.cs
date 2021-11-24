@@ -33,7 +33,6 @@ public class InterpreterTests
     public void TestInterpretBasicMultiplation()
     {
         var output = Interpret("print -10 * 2;");
-        Assert.NotNull(output);
         Assert.Equal($"-20{System.Environment.NewLine}", output);
     }
     
@@ -60,7 +59,6 @@ var c = ""global c"";
 print a;
 print b;
 print c;""");
-        Assert.NotNull(output);
         Assert.Equal(
 @"inner a
 outer b
@@ -88,7 +86,6 @@ if (no)
     print ""else no is true"";
 else
     print ""else no is not true"";");
-        Assert.NotNull(output);
         Assert.Equal(
 @$"yes is true
 else no is not true" + System.Environment.NewLine, output);
@@ -108,9 +105,24 @@ if (yes or no)
     print ""yes or no are true"";
 else
     print ""yes or no are not true"";");
-        Assert.NotNull(output);
         Assert.Equal(
 @$"yes and no are not true
 yes or no are true" + System.Environment.NewLine, output);
+    }
+    
+    [Fact]
+    public void TestWhileLoop()
+    {
+        var output = Interpret(
+@"var i = 0;
+var x = 0;
+while (i < 10)
+{
+    x = x + 1;
+    i = i + 1;
+}
+print x;");
+        Assert.Equal(
+            @$"10" + System.Environment.NewLine, output);
     }
 }

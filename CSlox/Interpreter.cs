@@ -1,5 +1,3 @@
-using System.Data;
-using System.Diagnostics;
 using System.Text;
 
 namespace CSLox;
@@ -162,6 +160,13 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
             Execute(ifStatement.thenBranchStatement);
         else if (ifStatement.elseBranchStatement != null)
             Execute(ifStatement.elseBranchStatement);
+        return null;
+    }
+
+    public object? VisitWhileStatementSyntax(WhileStatementSyntax whileStatement)
+    {
+        while (IsTruthy(Evaluate(whileStatement.conditionExpression)))
+            Execute(whileStatement.bodyStatement);
         return null;
     }
 

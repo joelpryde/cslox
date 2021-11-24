@@ -30,6 +30,11 @@ public record BlockStatementSyntax(List<StatementSyntax> statements) : Statement
     public override object? Accept(IStatementVisitor visitor) => visitor.VisitBlockStatementSyntax(this);
 }
 
+public record WhileStatementSyntax(ExpressionSyntax conditionExpression, StatementSyntax bodyStatement) : StatementSyntax()
+{
+    public override object? Accept(IStatementVisitor visitor) => visitor.VisitWhileStatementSyntax(this);
+}
+
 public interface IStatementVisitor
 {
     object? VisitExpressionStatementSyntax(ExpressionStatementSyntax expressionStatement);
@@ -37,4 +42,5 @@ public interface IStatementVisitor
     object? VisitVariableDeclarationStatementSyntax(VariableDeclarationStatementSyntax variableDeclarationStatement);
     object? VisitBlockStatementSyntax(BlockStatementSyntax blockStatement);
     object? VisitIfStatementSyntax(IfStatementSyntax ifStatement);
+    object? VisitWhileStatementSyntax(WhileStatementSyntax whileStatementSyntax);
 }
