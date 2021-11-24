@@ -20,6 +20,11 @@ public record VariableDeclarationStatementSyntax(Token name, ExpressionSyntax? i
     public override object? Accept(IStatementVisitor visitor) => visitor.VisitVariableDeclarationStatementSyntax(this);
 }
 
+public record IfStatementSyntax(ExpressionSyntax conditionExpression, StatementSyntax thenBranchStatement, StatementSyntax? elseBranchStatement) : StatementSyntax()
+{
+    public override object? Accept(IStatementVisitor visitor) => visitor.VisitIfStatementSyntax(this);
+}
+
 public record BlockStatementSyntax(List<StatementSyntax> statements) : StatementSyntax()
 {
     public override object? Accept(IStatementVisitor visitor) => visitor.VisitBlockStatementSyntax(this);
@@ -31,4 +36,5 @@ public interface IStatementVisitor
     object? VisitPrintStatementSyntax(PrintStatementSyntax printStatement);
     object? VisitVariableDeclarationStatementSyntax(VariableDeclarationStatementSyntax variableDeclarationStatement);
     object? VisitBlockStatementSyntax(BlockStatementSyntax blockStatement);
+    object? VisitIfStatementSyntax(IfStatementSyntax ifStatement);
 }

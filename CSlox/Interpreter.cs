@@ -138,6 +138,15 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         return null;
     }
 
+    public object? VisitIfStatementSyntax(IfStatementSyntax ifStatement)
+    {
+        if (IsTruthy(Evaluate(ifStatement.conditionExpression)))
+            Execute(ifStatement.thenBranchStatement);
+        else if (ifStatement.elseBranchStatement != null)
+            Execute(ifStatement.elseBranchStatement);
+        return null;
+    }
+
     void ExecuteBlock(List<StatementSyntax> blockStatements, Environment environment)
     {
         var previousEnvironment = _environment;

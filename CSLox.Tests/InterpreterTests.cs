@@ -6,7 +6,7 @@ public class InterpreterTests
 {
     public class TestcConsoleWriter : IConsoleWriter
     {
-        public string _output;
+        public string _output = string.Empty;
 
         public void ConsoleWriteLine(string output)
         {
@@ -72,5 +72,25 @@ global a
 global b
 global c" + System.Environment.NewLine, 
             output);
+    }
+    
+    [Fact]
+    public void TestBasicBranching()
+    {
+        var output = Interpret(
+@"var yes = true;
+var no = false;
+if (yes)
+    print ""yes is true"";
+else
+    print ""no is true"";
+if (no)
+    print ""else no is true"";
+else
+    print ""else no is not true"";");
+        Assert.NotNull(output);
+        Assert.Equal(
+@$"yes is true
+else no is not true" + System.Environment.NewLine, output);
     }
 }

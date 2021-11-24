@@ -82,11 +82,27 @@ internal class Parser
 
     StatementSyntax StatementRule()
     {
+        if (Match(TokenType.IF))
+            return IfStatementRule();
         if (Match(TokenType.PRINT))
             return PrintStatementRule();
         if (Match(TokenType.LEFT_BRACE))
             return new BlockStatementSyntax(BlockStatementRule());
         return ExpressionStatementRule();
+    }
+
+    StatementSyntax IfStatementRule()
+    {
+        Consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+        var condition = ExpressionRule();
+        Consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+        var thenBranch = StatementRule();
+        StatementSyntax? elseBranch = null;
+        if (Match(TokenType.ELSE))
+            elseBranch = StatementRule();
+
+        return new IfStatementSyntax(condition, thenBranch, elseBranch);
     }
 
     List<StatementSyntax> BlockStatementRule()
@@ -210,7 +226,7 @@ internal class Parser
     ExpressionSyntax PrimaryRule()
     {
         if (Match(TokenType.FALSE)) return new LiteralExpressionSyntax(false);
-        if (Match(TokenType.TRUE)) return new LiteralExpressionSyntax(false);
+        if (Match(TokenType.TRUE)) return new LiteralExpressionSyntax(true);
         if (Match(TokenType.NIL)) return new LiteralExpressionSyntax(null);
 
         if (Match(TokenType.NUMBER, TokenType.STRING))
