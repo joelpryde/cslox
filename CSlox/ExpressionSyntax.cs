@@ -33,7 +33,12 @@ public record VariableExpressionSyntax(Token name) : ExpressionSyntax()
 public record AssignmentExpressionSyntax(Token name, ExpressionSyntax value) : ExpressionSyntax()
 {
     public override object? Accept(IExpressionVisitor visitor) => visitor.VisitAssignmentExpressionSyntax(this);
-} 
+}
+
+public record LogicalExpressionSyntax(ExpressionSyntax leftExpression, Token operatorToken, ExpressionSyntax rightExpression) : ExpressionSyntax()
+{
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitLogicalExpressionSyntax(this);
+}
 
 public interface IExpressionVisitor
 {
@@ -43,4 +48,5 @@ public interface IExpressionVisitor
     object? VisitUnaryExpressionSyntax(UnaryExpressionSyntax unaryExpressionSyntax);
     object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax);
     object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentSyntaxSyntax);
+    object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpressionSyntax);
 }

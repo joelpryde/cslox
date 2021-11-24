@@ -137,7 +137,7 @@ internal class Parser
 
     ExpressionSyntax AssignmentRule()
     {
-        var expression = EqualityRule();
+        var expression = OrRule();
 
         if (Match(TokenType.EQUAL))
         {
@@ -151,6 +151,34 @@ internal class Parser
             }
 
             Error(equals, "Invalid assignment target.");
+        }
+
+        return expression;
+    }
+
+    ExpressionSyntax OrRule()
+    {
+        var expression = AndRule();
+
+        while (Match(TokenType.OR))
+        {
+            var operatorToken = Previous();
+            var rightExpression = AndRule();
+            expression = new LogicalExpressionSyntax(expression, operatorToken, rightExpression);
+        }
+
+        return expression;
+    }
+
+    ExpressionSyntax AndRule()
+    {
+        var expression = EqualityRule();
+
+        while (Match(TokenType.AND))
+        {
+            var operatorToken = Previous();
+            var rightExpression = EqualityRule();
+            expression = new LogicalExpressionSyntax(expression, operatorToken, rightExpression);
         }
 
         return expression;

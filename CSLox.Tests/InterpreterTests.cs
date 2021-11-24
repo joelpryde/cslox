@@ -93,4 +93,24 @@ else
 @$"yes is true
 else no is not true" + System.Environment.NewLine, output);
     }
+    
+    [Fact]
+    public void TestBranchingWithLogicalOperators()
+    {
+        var output = Interpret(
+@"var yes = true;
+var no = false;
+if (yes and no)
+    print ""yes and no are true"";
+else
+    print ""yes and no are not true"";
+if (yes or no)
+    print ""yes or no are true"";
+else
+    print ""yes or no are not true"";");
+        Assert.NotNull(output);
+        Assert.Equal(
+@$"yes and no are not true
+yes or no are true" + System.Environment.NewLine, output);
+    }
 }

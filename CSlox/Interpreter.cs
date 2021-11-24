@@ -56,6 +56,24 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         return value;
     }
 
+    public object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpressionSyntax)
+    {
+        var leftValue = Evaluate(logicalExpressionSyntax.leftExpression);
+
+        if (logicalExpressionSyntax.operatorToken.type == TokenType.OR)
+        {
+            if (IsTruthy(leftValue))
+                return leftValue;
+        }
+        else
+        {
+            if (!IsTruthy(leftValue))
+                return leftValue;
+        }
+
+        return Evaluate(logicalExpressionSyntax.rightExpression);
+    }
+
     bool IsTruthy(object? testObject)
     {
         return testObject switch
