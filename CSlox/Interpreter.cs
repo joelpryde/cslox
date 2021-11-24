@@ -45,6 +45,11 @@ internal class Interpreter : IExpressionVisitor, IStatementVisitor
         };
     }
 
+    public object? VisitVariableSyntax(VariableSyntax variableSyntax)
+    {
+        throw new NotImplementedException();
+    }
+
     bool IsTruthy(object? testObject)
     {
         return testObject switch
@@ -109,7 +114,12 @@ internal class Interpreter : IExpressionVisitor, IStatementVisitor
         var value = Evaluate(printStatement.expression);
         return value;
     }
-    
+
+    public object? VisitVariableDeclarationStatementSyntax(VariableDeclarationStatementSyntax variableDeclarationStatement)
+    {
+        throw new NotImplementedException();
+    }
+
     string Stringify(object? obj)
     {
         if (obj == null)

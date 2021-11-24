@@ -25,10 +25,16 @@ public record UnarySyntax(Token operatorToken, ExpressionSyntax rightExpression)
     public override object? Accept(IExpressionVisitor visitor) => visitor.VisitUnarySyntax(this);
 }
 
+public record VariableSyntax(Token name) : ExpressionSyntax()
+{
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitVariableSyntax(this);
+}
+
 public interface IExpressionVisitor
 {
     object? VisitBinarySyntax(BinarySyntax binarySyntax);
     object? VisitGroupingSyntax(GroupingSyntax groupingSyntax);
     object? VisitLiteralSyntax(LiteralSyntax literalSyntax);
     object? VisitUnarySyntax(UnarySyntax unarySyntax);
+    object? VisitVariableSyntax(VariableSyntax variableSyntax);
 }

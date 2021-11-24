@@ -1,3 +1,6 @@
+using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
+
 namespace CSLox;
 
 internal class Parser
@@ -36,13 +39,45 @@ internal class Parser
         {
             var statements = new List<StatementSyntax>();
             while (!IsAtEnd())
-                statements.Add(StatementRule());
+            {
+                var declaration = DeclarationRule();
+                if (declaration != null)
+                    statements.Add(declaration);
+            }
             return statements;
         }
         catch (Exception)
         {
             return new List<StatementSyntax>();
         }
+    }
+
+    StatementSyntax? DeclarationRule()
+    {
+        try
+        {
+            if (Match(TokenType.VAR))
+                return VariableDeclarationRule();
+            return StatementRule();
+        }
+        catch (ParseException error)
+        {
+            SynchronizeError();
+            return null;
+        }
+    }
+
+    StatementSyntax? VariableDeclarationRule()
+    {
+        var name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+        ExpressionSyntax? initializer = null;
+        if (Match(TokenType.EQUAL))
+            initializer = ExpressionRule();
+
+        Consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+        return new VariableDeclarationStatementSyntax(name, initializer);
+
     }
 
     StatementSyntax StatementRule()
@@ -143,6 +178,9 @@ internal class Parser
 
         if (Match(TokenType.NUMBER, TokenType.STRING))
             return new LiteralSyntax(Previous().literal);
+
+        if (Match(TokenType.IDENTIFIER))
+            return new VariableSyntax(Previous());
 
         if (Match(TokenType.LEFT_PAREN))
         {
