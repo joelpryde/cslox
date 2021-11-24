@@ -2,7 +2,7 @@
 
 static class CSLox
 {
-    static Interpreter _interpreter = new();
+    static readonly Interpreter _interpreter = new();
     static bool _hadError;
     static bool _hadRuntimeError;
 
@@ -45,7 +45,7 @@ static class CSLox
         var parser = new Parser(tokens);
         var expression = parser.Parse();
 
-        if (_hadError || expression == null)
+        if (_hadError)
             return;
 
         var output = _interpreter.Interpret(expression);

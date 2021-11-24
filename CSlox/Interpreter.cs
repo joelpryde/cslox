@@ -1,29 +1,23 @@
 using System.Data;
 using System.Diagnostics;
+using System.Text;
 
 namespace CSLox;
 
-internal class Interpreter : IExpressionVisitor
+internal class Interpreter : IExpressionVisitor, IStatementVisitor
 {
-    public string Interpret(ExpressionSyntax expression)
+    public string Interpret(List<StatementSyntax> statements)
     {
-        string Stringify(object? obj)
-        {
-            if (obj == null)
-                return "nil";
-            if (obj is double)
-            {
-                var text = obj.ToString() ?? "";
-                return text.EndsWith(".0") ? text[..^2] : text;
-            }
-
-            return obj.ToString() ?? "";
-        }
-
         try
         {
-            var value = Evaluate(expression);
-            return Stringify(value);
+            var builder = new StringBuilder();
+            foreach (var statement in statements)
+            {
+                var value = Execute(statement);
+                builder.Append(Stringify(value));
+            }
+
+            return builder.ToString();
         }
         catch (RuntimeError error)
         {
@@ -31,7 +25,9 @@ internal class Interpreter : IExpressionVisitor
             return string.Empty;
         }
     }
-    
+
+    object? Execute(StatementSyntax statement) => statement.Accept(this);
+
     public object? VisitLiteralSyntax(LiteralSyntax literalSyntax) => literalSyntax.literalValue;
 
     public object? VisitGroupingSyntax(GroupingSyntax groupingSyntax) => Evaluate(groupingSyntax);
@@ -101,6 +97,31 @@ internal class Interpreter : IExpressionVisitor
     }
 
     object? Evaluate(ExpressionSyntax expressionSyntax) => expressionSyntax.Accept(this);
+    
+    public object? VisitExpressionStatementSyntax(ExpressionStatementSyntax expressionStatement)
+    {
+        Evaluate(expressionStatement.expression);
+        return null;
+    }
+
+    public object? VisitPrintStatementSyntax(PrintStatementSyntax printStatement)
+    {
+        var value = Evaluate(printStatement.expression);
+        return value;
+    }
+    
+    string Stringify(object? obj)
+    {
+        if (obj == null)
+            return "nil";
+        if (obj is double)
+        {
+            var text = obj.ToString() ?? "";
+            return text.EndsWith(".0") ? text[..^2] : text;
+        }
+
+        return obj.ToString() ?? "";
+    }
 }
 
 public class RuntimeError : Exception

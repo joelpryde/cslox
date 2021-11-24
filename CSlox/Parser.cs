@@ -30,16 +30,40 @@ internal class Parser
         return false;
     }
 
-    public ExpressionSyntax? Parse()
+    public List<StatementSyntax> Parse()
     {
         try
         {
-            return ExpressionRule();
+            var statements = new List<StatementSyntax>();
+            while (!IsAtEnd())
+                statements.Add(StatementRule());
+            return statements;
         }
         catch (Exception)
         {
-            return null;
+            return new List<StatementSyntax>();
         }
+    }
+
+    StatementSyntax StatementRule()
+    {
+        if (Match(TokenType.PRINT))
+            return PrintStatementRule();
+        return ExpressionStatementRule();
+    }
+    
+    StatementSyntax PrintStatementRule()
+    {
+        var expression = ExpressionRule();
+        Consume(TokenType.SEMICOLON, "Expect '; after value.");
+        return new PrintStatementSyntax(expression);
+    }
+
+    StatementSyntax ExpressionStatementRule()
+    {
+        var expression = ExpressionRule();
+        Consume(TokenType.SEMICOLON, "Expect '; after expression.");
+        return new ExpressionStatementSyntax(expression);
     }
 
     ExpressionSyntax ExpressionRule() => EqualityRule();

@@ -111,7 +111,7 @@ internal class Scanner
 
         var identifierText = _source.Substring(_start, _current - _start);
         if (s_KeywordMap.TryGetValue(identifierText, out var keywordType))
-            addToken(TokenType.IDENTIFIER, keywordType);
+            addToken(keywordType);
         else
             addToken(TokenType.IDENTIFIER);
     }
