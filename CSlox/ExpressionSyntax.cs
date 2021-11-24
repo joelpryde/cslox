@@ -5,36 +5,36 @@ public abstract record ExpressionSyntax()
     public abstract object? Accept(IExpressionVisitor visitor);
 }
 
-public record BinarySyntax(ExpressionSyntax leftExpression, Token operatorToken, ExpressionSyntax rightExpression) : ExpressionSyntax()
+public record BinaryExpressionSyntax(ExpressionSyntax leftExpression, Token operatorToken, ExpressionSyntax rightExpression) : ExpressionSyntax()
 {
-    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitBinarySyntax(this);
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitBinaryExpressionSyntax(this);
 }
 
-public record GroupingSyntax(ExpressionSyntax expression) : ExpressionSyntax()
+public record GroupingExpressionSyntax(ExpressionSyntax expression) : ExpressionSyntax()
 {
-    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitGroupingSyntax(this);
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitGroupingExpressionSyntax(this);
 }
 
-public record LiteralSyntax(object? literalValue) : ExpressionSyntax()
+public record LiteralExpressionSyntax(object? literalValue) : ExpressionSyntax()
 {
-    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitLiteralSyntax(this);
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitLiteralExpressionSyntax(this);
 }
 
-public record UnarySyntax(Token operatorToken, ExpressionSyntax rightExpression) : ExpressionSyntax()
+public record UnaryExpressionSyntax(Token operatorToken, ExpressionSyntax rightExpression) : ExpressionSyntax()
 {
-    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitUnarySyntax(this);
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitUnaryExpressionSyntax(this);
 }
 
-public record VariableSyntax(Token name) : ExpressionSyntax()
+public record VariableExpressionSyntax(Token name) : ExpressionSyntax()
 {
-    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitVariableSyntax(this);
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitVariableExpressionSyntax(this);
 }
 
 public interface IExpressionVisitor
 {
-    object? VisitBinarySyntax(BinarySyntax binarySyntax);
-    object? VisitGroupingSyntax(GroupingSyntax groupingSyntax);
-    object? VisitLiteralSyntax(LiteralSyntax literalSyntax);
-    object? VisitUnarySyntax(UnarySyntax unarySyntax);
-    object? VisitVariableSyntax(VariableSyntax variableSyntax);
+    object? VisitBinaryExpressionSyntax(BinaryExpressionSyntax binaryExpressionSyntax);
+    object? VisitGroupingExpressionSyntax(GroupingExpressionSyntax groupingExpressionSyntax);
+    object? VisitLiteralExpressionSyntax(LiteralExpressionSyntax literalExpressionSyntax);
+    object? VisitUnaryExpressionSyntax(UnaryExpressionSyntax unaryExpressionSyntax);
+    object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax);
 }

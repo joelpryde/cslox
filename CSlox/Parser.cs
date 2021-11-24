@@ -110,7 +110,7 @@ internal class Parser
         {
             var operatorToken = Previous();
             var rightExpression = ComparisonRule();
-            expression = new BinarySyntax(expression, operatorToken, rightExpression);
+            expression = new BinaryExpressionSyntax(expression, operatorToken, rightExpression);
         }
 
         return expression;
@@ -124,7 +124,7 @@ internal class Parser
         {
             var operatorToken = Previous();
             var rightExpression = TerminalRule();
-            expression = new BinarySyntax(expression, operatorToken, rightExpression);
+            expression = new BinaryExpressionSyntax(expression, operatorToken, rightExpression);
         }
 
         return expression;
@@ -138,7 +138,7 @@ internal class Parser
         {
             var operatorToken = Previous();
             var rightExpression = FactorRule();
-            expression = new BinarySyntax(expression, operatorToken, rightExpression);
+            expression = new BinaryExpressionSyntax(expression, operatorToken, rightExpression);
         }
 
         return expression;
@@ -152,7 +152,7 @@ internal class Parser
         {
             var operatorToken = Previous();
             var rightExpression = UnaryRule();
-            expression = new BinarySyntax(expression, operatorToken, rightExpression);
+            expression = new BinaryExpressionSyntax(expression, operatorToken, rightExpression);
         }
 
         return expression;
@@ -164,7 +164,7 @@ internal class Parser
         {
             var operatorToken = Previous();
             var rightExpression = UnaryRule();
-            return new UnarySyntax(operatorToken, rightExpression);
+            return new UnaryExpressionSyntax(operatorToken, rightExpression);
         }
 
         return PrimaryRule();
@@ -172,21 +172,21 @@ internal class Parser
 
     ExpressionSyntax PrimaryRule()
     {
-        if (Match(TokenType.FALSE)) return new LiteralSyntax(false);
-        if (Match(TokenType.TRUE)) return new LiteralSyntax(false);
-        if (Match(TokenType.NIL)) return new LiteralSyntax(null);
+        if (Match(TokenType.FALSE)) return new LiteralExpressionSyntax(false);
+        if (Match(TokenType.TRUE)) return new LiteralExpressionSyntax(false);
+        if (Match(TokenType.NIL)) return new LiteralExpressionSyntax(null);
 
         if (Match(TokenType.NUMBER, TokenType.STRING))
-            return new LiteralSyntax(Previous().literal);
+            return new LiteralExpressionSyntax(Previous().literal);
 
         if (Match(TokenType.IDENTIFIER))
-            return new VariableSyntax(Previous());
+            return new VariableExpressionSyntax(Previous());
 
         if (Match(TokenType.LEFT_PAREN))
         {
             var expression = ExpressionRule();
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
-            return new GroupingSyntax(expression);
+            return new GroupingExpressionSyntax(expression);
         }
 
         throw Error(Peek(), "Expect expression.");

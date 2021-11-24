@@ -15,7 +15,7 @@ public record ExpressionStatementSyntax(ExpressionSyntax expression) : Statement
     public override object? Accept(IStatementVisitor visitor) => visitor.VisitExpressionStatementSyntax(this);
 }
 
-public record VariableDeclarationStatementSyntax(Token name, ExpressionSyntax expression) : StatementSyntax(expression)
+public record VariableDeclarationStatementSyntax(Token name, ExpressionSyntax? initializer) : StatementSyntax(initializer)
 {
     public override object? Accept(IStatementVisitor visitor) => visitor.VisitVariableDeclarationStatementSyntax(this);
 }

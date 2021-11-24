@@ -4,8 +4,10 @@ using System.Text;
 
 namespace CSLox;
 
-internal class Interpreter : IExpressionVisitor, IStatementVisitor
+class Interpreter : IExpressionVisitor, IStatementVisitor
 {
+    Environment _environment = new();
+    
     public string Interpret(List<StatementSyntax> statements)
     {
         try
@@ -28,27 +30,24 @@ internal class Interpreter : IExpressionVisitor, IStatementVisitor
 
     object? Execute(StatementSyntax statement) => statement.Accept(this);
 
-    public object? VisitLiteralSyntax(LiteralSyntax literalSyntax) => literalSyntax.literalValue;
+    public object? VisitLiteralExpressionSyntax(LiteralExpressionSyntax literalExpressionSyntax) => literalExpressionSyntax.literalValue;
 
-    public object? VisitGroupingSyntax(GroupingSyntax groupingSyntax) => Evaluate(groupingSyntax);
+    public object? VisitGroupingExpressionSyntax(GroupingExpressionSyntax groupingExpressionSyntax) => Evaluate(groupingExpressionSyntax);
     
-    public object? VisitUnarySyntax(UnarySyntax unarySyntax)
+    public object? VisitUnaryExpressionSyntax(UnaryExpressionSyntax unaryExpressionSyntax)
     {
-        var rightObject = Evaluate(unarySyntax.rightExpression);
+        var rightObject = Evaluate(unaryExpressionSyntax.rightExpression);
 
-        return unarySyntax.operatorToken.type switch
+        return unaryExpressionSyntax.operatorToken.type switch
         {
             TokenType.BANG => !IsTruthy(rightObject),
-            TokenType.MINUS when rightObject is not double => throw new RuntimeError(unarySyntax.operatorToken, "Operand must be a number."),
+            TokenType.MINUS when rightObject is not double => throw new RuntimeError(unaryExpressionSyntax.operatorToken, "Operand must be a number."),
             TokenType.MINUS => -(double)rightObject,
             _ => null
         };
     }
 
-    public object? VisitVariableSyntax(VariableSyntax variableSyntax)
-    {
-        throw new NotImplementedException();
-    }
+    public object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax) => _environment.Get(variableExpressionSyntax.name);
 
     bool IsTruthy(object? testObject)
     {
@@ -60,38 +59,38 @@ internal class Interpreter : IExpressionVisitor, IStatementVisitor
         };
     }
 
-    public object? VisitBinarySyntax(BinarySyntax binarySyntax)
+    public object? VisitBinaryExpressionSyntax(BinaryExpressionSyntax binaryExpressionSyntax)
     {
-        var leftObject = Evaluate(binarySyntax.leftExpression);
-        var rightObject = Evaluate(binarySyntax.rightExpression);
+        var leftObject = Evaluate(binaryExpressionSyntax.leftExpression);
+        var rightObject = Evaluate(binaryExpressionSyntax.rightExpression);
 
-        return binarySyntax.operatorToken.type switch
+        return binaryExpressionSyntax.operatorToken.type switch
         {
             TokenType.BANG_EQUAL => !IsEqual(leftObject, rightObject),
             TokenType.EQUAL_EQUAL => IsEqual(leftObject, rightObject),
-            TokenType.GREATER when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binarySyntax),
+            TokenType.GREATER when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binaryExpressionSyntax),
             TokenType.GREATER => (double)leftObject > (double)rightObject,
-            TokenType.GREATER_EQUAL when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binarySyntax),
+            TokenType.GREATER_EQUAL when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binaryExpressionSyntax),
             TokenType.GREATER_EQUAL => (double)leftObject >= (double)rightObject,
-            TokenType.LESS when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binarySyntax),
+            TokenType.LESS when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binaryExpressionSyntax),
             TokenType.LESS => (double)leftObject < (double)rightObject,
-            TokenType.LESS_EQUAL when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binarySyntax),
+            TokenType.LESS_EQUAL when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binaryExpressionSyntax),
             TokenType.LESS_EQUAL => (double)leftObject <= (double)rightObject,
-            TokenType.MINUS when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binarySyntax),
+            TokenType.MINUS when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binaryExpressionSyntax),
             TokenType.MINUS => (double)leftObject - (double)rightObject,
             TokenType.PLUS when (leftObject is double leftDouble) && (rightObject is double rightDouble) => leftDouble + rightDouble,
             TokenType.PLUS when (leftObject is string leftString) && (rightObject is string rightString) => leftString + rightString,
-            TokenType.PLUS => throw new RuntimeError(binarySyntax.operatorToken, "Operands must be two numbers or strings"),
-            TokenType.SLASH when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binarySyntax),
+            TokenType.PLUS => throw new RuntimeError(binaryExpressionSyntax.operatorToken, "Operands must be two numbers or strings"),
+            TokenType.SLASH when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binaryExpressionSyntax),
             TokenType.SLASH => (double)leftObject / (double)rightObject,
-            TokenType.STAR when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binarySyntax),
+            TokenType.STAR when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binaryExpressionSyntax),
             TokenType.STAR => (double)leftObject * (double)rightObject,
             
             _ => throw new InvalidOperationException()
         };
     }
 
-    static RuntimeError GenerateInvalidBinaryOperandsError(BinarySyntax binarySyntax) => new(binarySyntax.operatorToken, "Operands must be numbers");
+    static RuntimeError GenerateInvalidBinaryOperandsError(BinaryExpressionSyntax binaryExpressionSyntax) => new(binaryExpressionSyntax.operatorToken, "Operands must be numbers");
 
     bool IsEqual(object? leftObject, object? rightObject)
     {
@@ -117,7 +116,12 @@ internal class Interpreter : IExpressionVisitor, IStatementVisitor
 
     public object? VisitVariableDeclarationStatementSyntax(VariableDeclarationStatementSyntax variableDeclarationStatement)
     {
-        throw new NotImplementedException();
+        object? value = null;
+        if (variableDeclarationStatement.initializer != null)
+            value = Evaluate(variableDeclarationStatement.initializer);
+        
+        _environment.Define(variableDeclarationStatement.name.lexeme, value);
+        return null;
     }
 
     string Stringify(object? obj)

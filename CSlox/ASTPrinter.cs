@@ -5,18 +5,18 @@ public class ASTPrinter : IExpressionVisitor
 {
     public string Print(ExpressionSyntax expression) => expression.Accept(this)?.ToString() ?? string.Empty;
 
-    public object VisitBinarySyntax(BinarySyntax binarySyntax) => 
-        parenthesize(binarySyntax.operatorToken.lexeme, binarySyntax.leftExpression, binarySyntax.rightExpression);
+    public object VisitBinaryExpressionSyntax(BinaryExpressionSyntax binaryExpressionSyntax) => 
+        parenthesize(binaryExpressionSyntax.operatorToken.lexeme, binaryExpressionSyntax.leftExpression, binaryExpressionSyntax.rightExpression);
     
-    public object VisitGroupingSyntax(GroupingSyntax groupingSyntax) => 
-        parenthesize("group", groupingSyntax.expression);
+    public object VisitGroupingExpressionSyntax(GroupingExpressionSyntax groupingExpressionSyntax) => 
+        parenthesize("group", groupingExpressionSyntax.expression);
 
-    public object VisitLiteralSyntax(LiteralSyntax literalSyntax) => literalSyntax.literalValue?.ToString() ?? "nil";
+    public object VisitLiteralExpressionSyntax(LiteralExpressionSyntax literalExpressionSyntax) => literalExpressionSyntax.literalValue?.ToString() ?? "nil";
 
-    public object VisitUnarySyntax(UnarySyntax unarySyntax) => 
-        parenthesize(unarySyntax.operatorToken.lexeme, unarySyntax.rightExpression);
+    public object VisitUnaryExpressionSyntax(UnaryExpressionSyntax unaryExpressionSyntax) => 
+        parenthesize(unaryExpressionSyntax.operatorToken.lexeme, unaryExpressionSyntax.rightExpression);
 
-    public object? VisitVariableSyntax(VariableSyntax variableSyntax) => variableSyntax.name;
+    public object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax) => variableExpressionSyntax.name;
 
     string parenthesize(string name, params ExpressionSyntax[] expressionSyntaxes)
     {
