@@ -101,7 +101,28 @@ internal class Parser
         return new ExpressionStatementSyntax(expression);
     }
 
-    ExpressionSyntax ExpressionRule() => EqualityRule();
+    ExpressionSyntax ExpressionRule() => AssignmentRule();
+
+    ExpressionSyntax AssignmentRule()
+    {
+        var expression = EqualityRule();
+
+        if (Match(TokenType.EQUAL))
+        {
+            var equals = Previous();
+            var value = AssignmentRule();
+
+            if (expression is VariableExpressionSyntax variableExpressionSyntax)
+            {
+                var name = variableExpressionSyntax.name;
+                return new AssignmentExpressionSyntax(name, value);
+            }
+
+            Error(equals, "Invalid assignment target.");
+        }
+
+        return expression;
+    }
 
     ExpressionSyntax EqualityRule()
     {

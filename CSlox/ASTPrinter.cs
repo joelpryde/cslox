@@ -17,6 +17,8 @@ public class ASTPrinter : IExpressionVisitor
         parenthesize(unaryExpressionSyntax.operatorToken.lexeme, unaryExpressionSyntax.rightExpression);
 
     public object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax) => variableExpressionSyntax.name;
+    
+    public object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentSyntaxSyntax) => throw new NotImplementedException();
 
     string parenthesize(string name, params ExpressionSyntax[] expressionSyntaxes)
     {

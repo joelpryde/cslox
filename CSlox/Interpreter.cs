@@ -48,6 +48,12 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
     }
 
     public object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax) => _environment.Get(variableExpressionSyntax.name);
+    public object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentSyntaxSyntax)
+    {
+        var value = Evaluate(assignmentSyntaxSyntax.value);
+        _environment.Assign(assignmentSyntaxSyntax.name, value);
+        return value;
+    }
 
     bool IsTruthy(object? testObject)
     {
