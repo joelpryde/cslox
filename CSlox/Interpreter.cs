@@ -1,10 +1,17 @@
+using System.Data;
 using System.Text;
 
 namespace CSLox;
 
 class Interpreter : IExpressionVisitor, IStatementVisitor
 {
+    internal Environment _globals = new();
     Environment _environment = new();
+
+    public Interpreter()
+    {
+        _globals.Define("clock", new ClockLoxCallable());
+    }
     
     public string Interpret(List<StatementSyntax> statements)
     {
@@ -54,11 +61,11 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         return value;
     }
 
-    public object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpressionSyntax)
+    public object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpression)
     {
-        var leftValue = Evaluate(logicalExpressionSyntax.leftExpression);
+        var leftValue = Evaluate(logicalExpression.leftExpression);
 
-        if (logicalExpressionSyntax.operatorToken.type == TokenType.OR)
+        if (logicalExpression.operatorToken.type == TokenType.OR)
         {
             if (IsTruthy(leftValue))
                 return leftValue;
@@ -69,7 +76,16 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
                 return leftValue;
         }
 
-        return Evaluate(logicalExpressionSyntax.rightExpression);
+        return Evaluate(logicalExpression.rightExpression);
+    }
+
+    public object? VisitCallExpressionSyntax(CallExpressionSyntax callExpression)
+    {
+        var callee = Evaluate(callExpression.callee);
+        var arguments = callExpression.arguments.Select(Evaluate);
+        if (callee == null) throw new InvalidOperationException();
+        var function = (ILoxCallable)callee;
+        return function.Call(this, arguments.ToList());
     }
 
     bool IsTruthy(object? testObject)
@@ -170,7 +186,14 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         return null;
     }
 
-    void ExecuteBlock(List<StatementSyntax> blockStatements, Environment environment)
+    public object? VisitFunctionDeclarationStatementSyntax(FunctionDeclarationStatementSyntax functionDeclarationStatement)
+    {
+        var function = new LoxFunction(functionDeclarationStatement);
+        _environment.Define(functionDeclarationStatement.name.lexeme, function);
+        return null;
+    }
+
+    internal void ExecuteBlock(List<StatementSyntax> blockStatements, Environment environment)
     {
         var previousEnvironment = _environment;
         try

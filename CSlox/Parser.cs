@@ -56,6 +56,8 @@ internal class Parser
     {
         try
         {
+            if (Match(TokenType.FUN))
+                return FunctionDeclarationRule("function");
             if (Match(TokenType.VAR))
                 return VariableDeclarationRule();
             return StatementRule();
@@ -65,6 +67,29 @@ internal class Parser
             SynchronizeError();
             return null;
         }
+    }
+
+    StatementSyntax FunctionDeclarationRule(string kind)
+    {
+        var name = Consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
+        Consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name.");
+        
+        var parameters = new List<Token>();
+        if (!Check(TokenType.RIGHT_PAREN))
+        {
+            do
+            {
+                if (parameters.Count > 255)
+                    Error(Peek(), "Can't have more than 255 parameters.");
+                parameters.Add(Consume(TokenType.IDENTIFIER, "Expect parameter name."));
+            } while (Match(TokenType.COMMA));
+        }
+
+        Consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+        Consume(TokenType.LEFT_BRACE, $"Expect '{{' before {kind} body.");
+        var body = BlockStatementRule();
+
+        return new FunctionDeclarationStatementSyntax(name, parameters, body);
     }
 
     StatementSyntax? VariableDeclarationRule()
@@ -297,8 +322,41 @@ internal class Parser
             var rightExpression = UnaryRule();
             return new UnaryExpressionSyntax(operatorToken, rightExpression);
         }
+        
+        return CallRule();
+    }
 
-        return PrimaryRule();
+    ExpressionSyntax CallRule()
+    {
+        var expression = PrimaryRule();
+
+        while (true)
+        {
+            if (Match(TokenType.LEFT_PAREN))
+                expression = FinishCall(expression);
+            else
+                break;
+        }
+
+        return expression;
+    }
+
+    ExpressionSyntax FinishCall(ExpressionSyntax callee)
+    {
+        var arguments = new List<ExpressionSyntax>();
+        if (!Check(TokenType.RIGHT_PAREN))
+        {
+            do
+            {
+                if (arguments.Count >= 255)
+                    Error(Peek(), "Can't have more than 255 arguments in function call.");
+                arguments.Add(EqualityRule());
+            } while (Match(TokenType.COMMA));
+        }
+
+        var parenToken = Consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new CallExpressionSyntax(callee, parenToken, arguments);
     }
 
     ExpressionSyntax PrimaryRule()

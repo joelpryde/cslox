@@ -40,6 +40,12 @@ public record LogicalExpressionSyntax(ExpressionSyntax leftExpression, Token ope
     public override object? Accept(IExpressionVisitor visitor) => visitor.VisitLogicalExpressionSyntax(this);
 }
 
+public record CallExpressionSyntax(ExpressionSyntax callee, Token parenToken, List<ExpressionSyntax> arguments) : ExpressionSyntax()
+{
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitCallExpressionSyntax(this);
+}
+
+
 public interface IExpressionVisitor
 {
     object? VisitBinaryExpressionSyntax(BinaryExpressionSyntax binaryExpressionSyntax);
@@ -48,5 +54,6 @@ public interface IExpressionVisitor
     object? VisitUnaryExpressionSyntax(UnaryExpressionSyntax unaryExpressionSyntax);
     object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax);
     object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentSyntaxSyntax);
-    object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpressionSyntax);
+    object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpression);
+    object? VisitCallExpressionSyntax(CallExpressionSyntax callExpression);
 }

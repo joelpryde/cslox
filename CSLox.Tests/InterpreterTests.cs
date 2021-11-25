@@ -122,8 +122,7 @@ while (i < 10)
     i = i + 1;
 }
 print x;");
-        Assert.Equal(
-            @$"10" + System.Environment.NewLine, output);
+        Assert.Equal(@$"10" + System.Environment.NewLine, output);
     }
     
     [Fact]
@@ -136,7 +135,18 @@ for (var i = 0; i < 10; i = i + 1)
     x = x + 1;
 }
 print x;");
-        Assert.Equal(
-            @$"10" + System.Environment.NewLine, output);
+        Assert.Equal(@$"10" + System.Environment.NewLine, output);
+    }
+    
+    [Fact]
+    public void TestBasicFunctionInvocation()
+    {
+        var output = Interpret(
+@"fun sayHi(first, last)
+{ 
+    print ""Hi "" + first + "" "" + last;
+}
+sayHi(""L33t"", ""Hax0r"");");
+        Assert.Equal(@$"Hi L33t Hax0r" + System.Environment.NewLine, output);
     }
 }

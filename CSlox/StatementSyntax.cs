@@ -35,6 +35,11 @@ public record WhileStatementSyntax(ExpressionSyntax conditionExpression, Stateme
     public override object? Accept(IStatementVisitor visitor) => visitor.VisitWhileStatementSyntax(this);
 }
 
+public record FunctionDeclarationStatementSyntax(Token name, List<Token> parameters, List<StatementSyntax> bodyStatements) : StatementSyntax()
+{
+    public override object? Accept(IStatementVisitor visitor) => visitor.VisitFunctionDeclarationStatementSyntax(this);
+} 
+
 public interface IStatementVisitor
 {
     object? VisitExpressionStatementSyntax(ExpressionStatementSyntax expressionStatement);
@@ -43,4 +48,5 @@ public interface IStatementVisitor
     object? VisitBlockStatementSyntax(BlockStatementSyntax blockStatement);
     object? VisitIfStatementSyntax(IfStatementSyntax ifStatement);
     object? VisitWhileStatementSyntax(WhileStatementSyntax whileStatementSyntax);
+    object? VisitFunctionDeclarationStatementSyntax(FunctionDeclarationStatementSyntax functionDeclarationStatement);
 }
