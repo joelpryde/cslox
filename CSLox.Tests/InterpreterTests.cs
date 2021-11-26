@@ -4,13 +4,15 @@ namespace CSLox.Tests;
 
 public class InterpreterTests
 {
+    static string NL => System.Environment.NewLine;
+
     public class TestcConsoleWriter : IConsoleWriter
     {
         public string _output = string.Empty;
 
         public void ConsoleWriteLine(string output)
         {
-            _output += output + System.Environment.NewLine;   
+            _output += output + NL;   
         }
     }
     
@@ -33,7 +35,7 @@ public class InterpreterTests
     public void TestInterpretBasicMultiplation()
     {
         var output = Interpret("print -10 * 2;");
-        Assert.Equal($"-20{System.Environment.NewLine}", output);
+        Assert.Equal($"-20{NL}", output);
     }
     
     [Fact]
@@ -68,7 +70,7 @@ outer b
 global c
 global a
 global b
-global c" + System.Environment.NewLine, 
+global c" + NL, 
             output);
     }
     
@@ -88,7 +90,7 @@ else
     print ""else no is not true"";");
         Assert.Equal(
 @$"yes is true
-else no is not true" + System.Environment.NewLine, output);
+else no is not true" + NL, output);
     }
     
     [Fact]
@@ -107,7 +109,7 @@ else
     print ""yes or no are not true"";");
         Assert.Equal(
 @$"yes and no are not true
-yes or no are true" + System.Environment.NewLine, output);
+yes or no are true" + NL, output);
     }
     
     [Fact]
@@ -122,7 +124,7 @@ while (i < 10)
     i = i + 1;
 }
 print x;");
-        Assert.Equal(@$"10" + System.Environment.NewLine, output);
+        Assert.Equal(@$"10" + NL, output);
     }
     
     [Fact]
@@ -135,7 +137,7 @@ for (var i = 0; i < 10; i = i + 1)
     x = x + 1;
 }
 print x;");
-        Assert.Equal(@$"10" + System.Environment.NewLine, output);
+        Assert.Equal(@$"10" + NL, output);
     }
     
     [Fact]
@@ -147,7 +149,7 @@ print x;");
     print ""Hi "" + first + "" "" + last;
 }
 sayHi(""L33t"", ""Hax0r"");");
-        Assert.Equal(@$"Hi L33t Hax0r" + System.Environment.NewLine, output);
+        Assert.Equal(@$"Hi L33t Hax0r" + NL, output);
     }
     
     [Fact]
@@ -159,7 +161,7 @@ sayHi(""L33t"", ""Hax0r"");");
     return 3;
 }
 print someValue();");
-        Assert.Equal(@$"3" + System.Environment.NewLine, output);
+        Assert.Equal(@$"3" + NL, output);
     }
     
     [Fact]
@@ -174,6 +176,26 @@ print someValue();");
         return x + someValue(x + 1);
 }
 print someValue(0);");
-        Assert.Equal(@$"6" + System.Environment.NewLine, output);
+        Assert.Equal(@$"6" + NL, output);
+    }
+    
+    [Fact]
+    public void TestFunctionWithClosure()
+    {
+        var output = Interpret(
+@"fun makeCounter()
+{
+    var i = 0;
+    fun count()
+    {
+        i = i + 1;
+        print i;
+    }
+    return count;
+}
+var counter = makeCounter();
+counter();
+counter();");
+        Assert.Equal(@$"1{NL}2{NL}", output);
     }
 }

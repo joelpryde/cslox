@@ -8,18 +8,20 @@ interface ILoxCallable
 
 class LoxFunction : ILoxCallable
 {
-    FunctionDeclarationStatementSyntax _functionDeclaration;
+    readonly FunctionDeclarationStatementSyntax _functionDeclaration;
+    readonly Environment _closure;
 
-    public LoxFunction(FunctionDeclarationStatementSyntax functionDeclaration)
+    public LoxFunction(FunctionDeclarationStatementSyntax functionDeclaration, Environment closure)
     {
         _functionDeclaration = functionDeclaration;
+        _closure = closure;
     }
 
     public int Arity() => _functionDeclaration.parameters.Count;
 
     public object? Call(Interpreter interpreter, List<object?> arguments)
     {
-        var environment = new Environment(interpreter._globals);
+        var environment = new Environment(_closure);
         for (var i = 0; i < _functionDeclaration.parameters.Count; i++)
             environment.Define(_functionDeclaration.parameters[i].lexeme, arguments[i]);
 
