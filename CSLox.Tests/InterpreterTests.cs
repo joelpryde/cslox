@@ -149,4 +149,31 @@ print x;");
 sayHi(""L33t"", ""Hax0r"");");
         Assert.Equal(@$"Hi L33t Hax0r" + System.Environment.NewLine, output);
     }
+    
+    [Fact]
+    public void TestFunctionReturningValue()
+    {
+        var output = Interpret(
+@"fun someValue()
+{ 
+    return 3;
+}
+print someValue();");
+        Assert.Equal(@$"3" + System.Environment.NewLine, output);
+    }
+    
+    [Fact]
+    public void TestFunctionWithBasicRecursion()
+    {
+        var output = Interpret(
+@"fun someValue(x)
+{
+    if (x > 3)
+        return 0;
+    else
+        return x + someValue(x + 1);
+}
+print someValue(0);");
+        Assert.Equal(@$"6" + System.Environment.NewLine, output);
+    }
 }

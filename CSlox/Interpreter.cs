@@ -6,10 +6,11 @@ namespace CSLox;
 class Interpreter : IExpressionVisitor, IStatementVisitor
 {
     internal Environment _globals = new();
-    Environment _environment = new();
-
+    Environment _environment;
+    
     public Interpreter()
     {
+        _environment = _globals;
         _globals.Define("clock", new ClockLoxCallable());
     }
     
@@ -193,6 +194,15 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         return null;
     }
 
+    public object? VisitReturnStatementSyntax(ReturnStatementSyntax returnStatement)
+    {
+        object? value = null;
+        if (returnStatement.valueExpression != null)
+            value = Evaluate(returnStatement.valueExpression);
+        
+        throw new CallReturnException(value);
+    }
+
     internal void ExecuteBlock(List<StatementSyntax> blockStatements, Environment environment)
     {
         var previousEnvironment = _environment;
@@ -220,6 +230,12 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
 
         return obj.ToString() ?? "";
     }
+}
+
+class CallReturnException : Exception
+{
+    internal object? _returnValue;
+    public CallReturnException(object? returnValue) => _returnValue = returnValue;
 }
 
 public class RuntimeError : Exception

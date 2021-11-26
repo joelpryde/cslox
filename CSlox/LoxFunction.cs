@@ -23,7 +23,15 @@ class LoxFunction : ILoxCallable
         for (var i = 0; i < _functionDeclaration.parameters.Count; i++)
             environment.Define(_functionDeclaration.parameters[i].lexeme, arguments[i]);
 
-        interpreter.ExecuteBlock(_functionDeclaration.bodyStatements, environment);
+        try
+        {
+            interpreter.ExecuteBlock(_functionDeclaration.bodyStatements, environment);
+        }
+        catch (CallReturnException returnException)
+        {
+            return returnException._returnValue;
+        }
+        
         return null;
     }
     

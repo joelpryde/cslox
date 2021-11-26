@@ -113,13 +113,26 @@ internal class Parser
             return IfStatementRule();
         if (Match(TokenType.PRINT))
             return PrintStatementRule();
+        if (Match(TokenType.RETURN))
+            return ReturnStatementRule();
         if (Match(TokenType.WHILE))
             return WhileStatementRule();
         if (Match(TokenType.LEFT_BRACE))
             return new BlockStatementSyntax(BlockStatementRule());
         return ExpressionStatementRule();
     }
-    
+
+    StatementSyntax ReturnStatementRule()
+    {
+        var keyword = Previous();
+        ExpressionSyntax? value = null;
+        if (!Check(TokenType.SEMICOLON))
+            value = EqualityRule();
+
+        Consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+        return new ReturnStatementSyntax(keyword, value);
+    }
+
     StatementSyntax ForStatementRule()
     {
         Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
