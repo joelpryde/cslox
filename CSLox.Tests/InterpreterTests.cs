@@ -23,10 +23,14 @@ public class InterpreterTests
 
         var scanner = new Scanner(source);
         var tokens = scanner.scanTokens();
+        
         var parser = new Parser(tokens);
         var statements = parser.Parse();
-        var interpreter = new Interpreter();
         
+        var interpreter = new Interpreter();
+        var resolver = new Resolver(interpreter);
+        
+        resolver.Resolve(statements);
         interpreter.Interpret(statements);
         return testConsoleWriter._output;
     }
@@ -197,5 +201,22 @@ var counter = makeCounter();
 counter();
 counter();");
         Assert.Equal(@$"1{NL}2{NL}", output);
+    }
+    
+    [Fact]
+    public void TestCorrectVariableBindingInScopes()
+    {
+        var output = Interpret(
+@"var a = ""global"";
+{
+    fun showA()
+    {
+        print a;
+    }
+    showA();
+    var a = ""block"";
+    showA();
+}");
+        Assert.Equal(@$"global{NL}global{NL}", output);
     }
 }

@@ -53,7 +53,7 @@ public interface IExpressionVisitor
     object? VisitLiteralExpressionSyntax(LiteralExpressionSyntax literalExpressionSyntax);
     object? VisitUnaryExpressionSyntax(UnaryExpressionSyntax unaryExpressionSyntax);
     object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax);
-    object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentSyntaxSyntax);
+    object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentExpression);
     object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpression);
     object? VisitCallExpressionSyntax(CallExpressionSyntax callExpression);
 }

@@ -42,13 +42,20 @@ static class CSLox
     {
         var scanner = new Scanner(source);
         var tokens = scanner.scanTokens();
+        
         var parser = new Parser(tokens);
-        var expression = parser.Parse();
+        var statements = parser.Parse();
 
         if (_hadError)
             return;
 
-        var output = _interpreter.Interpret(expression);
+        var resolver = new Resolver(_interpreter);
+        resolver.Resolve(statements);
+        
+        if (_hadError)
+            return;
+
+        var output = _interpreter.Interpret(statements);
         Console.WriteLine(output);
     }
 

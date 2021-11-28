@@ -20,7 +20,7 @@ internal class Scanner
             scanToken();
         }
         
-        _tokens.Add(new Token(TokenType.EOF, "", null, _line));
+        _tokens.Add(new Token(TokenType.EOF, "", null, _line, _start, _start));
         return _tokens;
     }
 
@@ -29,7 +29,7 @@ internal class Scanner
     bool isAlphaNumeric(char c) => isAlpha(c) || isDigit(c);
     bool isAtEnd() => _current >= _source.Length;
     char advance() => _source[_current++];
-    void addToken(TokenType type, object? literal) => _tokens.Add(new Token(type, _source.Substring(_start, _current-_start), literal, _line));
+    void addToken(TokenType type, object? literal) => _tokens.Add(new Token(type, _source.Substring(_start, _current-_start), literal, _line, _start, _current));
     void addToken(TokenType type) => addToken(type, null);
     
     void scanToken()

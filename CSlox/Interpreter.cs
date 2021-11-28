@@ -5,8 +5,9 @@ namespace CSLox;
 
 class Interpreter : IExpressionVisitor, IStatementVisitor
 {
-    internal Environment _globals = new();
+    readonly Environment _globals = new();
     Environment _environment;
+    Dictionary<ExpressionSyntax, int> _localsDistance = new();
     
     public Interpreter()
     {
@@ -54,11 +55,28 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         };
     }
 
-    public object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax) => _environment.Get(variableExpressionSyntax.name);
-    public object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentSyntaxSyntax)
+    public object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax)
     {
-        var value = Evaluate(assignmentSyntaxSyntax.value);
-        _environment.Assign(assignmentSyntaxSyntax.name, value);
+        return LookupVariable(variableExpressionSyntax.name, variableExpressionSyntax);
+    }
+
+    object? LookupVariable(Token name, VariableExpressionSyntax expression)
+    {
+        if (_localsDistance.ContainsKey(expression))
+            return _environment.GetAt(_localsDistance[expression], name.lexeme);
+        
+        return _globals.Get(expression.name);
+    }
+
+    public object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentExpression)
+    {
+        var value = Evaluate(assignmentExpression.value);
+        
+        if (_localsDistance.ContainsKey(assignmentExpression))
+            _environment.AssignAt(_localsDistance[assignmentExpression], assignmentExpression.name, value);
+        else
+            _globals.Assign(assignmentExpression.name, value);
+        
         return value;
     }
 
@@ -86,6 +104,7 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         var arguments = callExpression.arguments.Select(Evaluate);
         if (callee == null) throw new InvalidOperationException();
         var function = (ILoxCallable)callee;
+        
         return function.Call(this, arguments.ToList());
     }
 
@@ -230,11 +249,19 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
 
         return obj.ToString() ?? "";
     }
+
+    public void Resolve(ExpressionSyntax variableExpression, int depth)
+    {
+        if (_localsDistance.ContainsKey(variableExpression))
+            throw new InvalidOperationException();
+        _localsDistance[variableExpression] = depth;
+    }
 }
 
 class CallReturnException : Exception
 {
-    internal object? _returnValue;
+    internal readonly object? _returnValue;
+    
     public CallReturnException(object? returnValue) => _returnValue = returnValue;
 }
 

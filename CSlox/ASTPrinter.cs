@@ -18,7 +18,7 @@ public class ASTPrinter : IExpressionVisitor
 
     public object? VisitVariableExpressionSyntax(VariableExpressionSyntax variableExpressionSyntax) => variableExpressionSyntax.name;
     
-    public object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentSyntaxSyntax) => throw new NotImplementedException();
+    public object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentExpression) => throw new NotImplementedException();
     public object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpression) => throw new NotImplementedException();
     public object? VisitCallExpressionSyntax(CallExpressionSyntax callExpression) => throw new NotImplementedException();
 

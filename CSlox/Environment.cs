@@ -30,4 +30,24 @@ class Environment
         else 
             throw new RuntimeError(name, $"Undefined variable '{name.lexeme}'.");
     }
+
+    public object? GetAt(int distance, string name)
+    {
+        var ancestor = Ancestor(distance); 
+        return ancestor?._values[name];
+    }
+
+    Environment Ancestor(int distance)
+    {
+        var environment = this;
+        for (var i = 0; i < distance; i++)
+            environment = environment._enclosing;
+
+        return environment;
+    }
+
+    public void AssignAt(int distance, Token name, object? value)
+    {
+        Ancestor(distance)._values[name.lexeme] = value;
+    }
 }
