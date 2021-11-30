@@ -255,4 +255,19 @@ bagel.thing = ""thing"";
 print bagel.thing;");
         Assert.Equal(@$"thing{NL}", output);
     }
+    
+    [Fact]
+    public void TestClassMethodCall()
+    {
+        var output = Interpret(
+$@"class Bagel {{
+    eat()
+    {{
+        print ""chew chew"";
+    }}
+}}
+var bagel = Bagel();
+bagel.eat();");
+        Assert.Equal(@$"chew chew{NL}", output);
+    }
 }

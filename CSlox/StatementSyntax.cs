@@ -45,7 +45,7 @@ public record ReturnStatementSyntax(Token keywordToken, ExpressionSyntax? valueE
     public override object? Accept(IStatementVisitor visitor) => visitor.VisitReturnStatementSyntax(this);
 }
 
-public record ClassStatementSyntax(Token name, List<StatementSyntax> methods) : StatementSyntax()
+public record ClassStatementSyntax(Token name, List<FunctionDeclarationStatementSyntax> methods) : StatementSyntax()
 {
     public override object? Accept(IStatementVisitor visitor) => visitor.VisitClassStatementSyntax(this);
 }

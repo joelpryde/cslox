@@ -249,7 +249,14 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
     public object? VisitClassStatementSyntax(ClassStatementSyntax classStatement)
     {
         _environment.Define(classStatement.name.lexeme, null);
-        var klass = new LoxClass(classStatement.name.lexeme);
+        var methods = new Dictionary<string, LoxFunction>();
+        foreach (var method in classStatement.methods)
+        {
+            var function = new LoxFunction(method, _environment);
+            methods[method.name.lexeme] = function;
+        }
+        
+        var klass = new LoxClass(classStatement.name.lexeme, methods);
         _environment.Assign(classStatement.name, klass);
 
         return null;

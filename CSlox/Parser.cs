@@ -73,9 +73,9 @@ class Parser
         var name = Consume(TokenType.IDENTIFIER, "Expect class name.");
         Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
 
-        var methods = new List<StatementSyntax>();
+        var methods = new List<FunctionDeclarationStatementSyntax>();
         while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
-            methods.Add(FunctionDeclarationRule("method"));
+            methods.Add((FunctionDeclarationStatementSyntax)FunctionDeclarationRule("method"));
 
         Consume(TokenType.RIGHT_BRACE, "Expect '{' after class body.");
 

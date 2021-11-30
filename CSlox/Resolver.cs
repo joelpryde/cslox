@@ -3,7 +3,8 @@ namespace CSLox;
 enum FunctionType
 {
     None,
-    Function
+    Function,
+    METHOD
 }
 
 class Resolver : IExpressionVisitor, IStatementVisitor
@@ -230,6 +231,9 @@ class Resolver : IExpressionVisitor, IStatementVisitor
     {
         Declare(classStatement.name);
         Define(classStatement.name);
+        
+        foreach (var method in classStatement.methods)
+            ResolveFunction(method, FunctionType.METHOD);
 
         return null;
     }
