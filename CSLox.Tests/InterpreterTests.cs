@@ -244,4 +244,15 @@ var bagel = Bagel();
 print bagel;");
         Assert.Equal(@$"Bagel instance{NL}", output);
     }
+    
+    [Fact]
+    public void TestClassInstanceProperties()
+    {
+        var output = Interpret(
+$@"class Bagel {{}}
+var bagel = Bagel();
+bagel.thing = ""thing"";
+print bagel.thing;");
+        Assert.Equal(@$"thing{NL}", output);
+    }
 }

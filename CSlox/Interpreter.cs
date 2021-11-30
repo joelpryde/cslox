@@ -108,6 +108,30 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         return function.Call(this, arguments.ToList());
     }
 
+    public object? VisitGetExpressionSyntax(GetExpressionSyntax getExpression)
+    {
+        var objectValue = Evaluate(getExpression.objectSyntax);
+        if (objectValue is LoxInstance instance)
+            return instance.Get(getExpression.name);
+
+        throw new RuntimeError(getExpression.name, "Only instances have properties.");
+
+    }
+
+    public object? VisitSetExpressionSyntax(SetExpressionSyntax setExpression)
+    {
+        var objectInstance = Evaluate(setExpression.objectSyntax);
+        
+        if (objectInstance is LoxInstance loxInstance)
+        {
+            var objectValue = Evaluate(setExpression.value);
+            loxInstance.Set(setExpression.name, objectValue);
+            return objectValue;
+        }
+
+        throw new RuntimeError(setExpression.name, "Only instances have fields.");
+    }
+
     bool IsTruthy(object? testObject)
     {
         return testObject switch

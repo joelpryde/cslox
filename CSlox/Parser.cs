@@ -1,9 +1,6 @@
-using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
-
 namespace CSLox;
 
-internal class Parser
+class Parser
 {
     List<Token> _tokens;
     int _current;
@@ -253,6 +250,8 @@ internal class Parser
                 var name = variableExpressionSyntax.name;
                 return new AssignmentExpressionSyntax(name, value);
             }
+            else if (expression is GetExpressionSyntax getExpression)
+                return new SetExpressionSyntax(getExpression.objectSyntax, getExpression.name, value);
 
             Error(equals, "Invalid assignment target.");
         }
@@ -363,6 +362,11 @@ internal class Parser
         {
             if (Match(TokenType.LEFT_PAREN))
                 expression = FinishCall(expression);
+            else if (Match(TokenType.DOT))
+            {
+                var name = Consume(TokenType.IDENTIFIER, "Expect property name after '.'.");
+                expression = new GetExpressionSyntax(expression, name);
+            }
             else
                 break;
         }

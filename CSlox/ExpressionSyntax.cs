@@ -45,6 +45,16 @@ public record CallExpressionSyntax(ExpressionSyntax callee, Token parenToken, Li
     public override object? Accept(IExpressionVisitor visitor) => visitor.VisitCallExpressionSyntax(this);
 }
 
+public record GetExpressionSyntax(ExpressionSyntax objectSyntax, Token name) : ExpressionSyntax()
+{
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitGetExpressionSyntax(this);
+}
+
+public record SetExpressionSyntax(ExpressionSyntax objectSyntax, Token name, ExpressionSyntax value) : ExpressionSyntax()
+{
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitSetExpressionSyntax(this);
+}
+
 
 public interface IExpressionVisitor
 {
@@ -56,4 +66,6 @@ public interface IExpressionVisitor
     object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentExpression);
     object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpression);
     object? VisitCallExpressionSyntax(CallExpressionSyntax callExpression);
+    object? VisitGetExpressionSyntax(GetExpressionSyntax getExpression);
+    object? VisitSetExpressionSyntax(SetExpressionSyntax setExpression);
 }

@@ -140,6 +140,21 @@ class Resolver : IExpressionVisitor, IStatementVisitor
         return null;
     }
 
+    public object? VisitGetExpressionSyntax(GetExpressionSyntax getExpression)
+    {
+        Resolve(getExpression.objectSyntax);
+
+        return null;
+    }
+
+    public object? VisitSetExpressionSyntax(SetExpressionSyntax setExpression)
+    {
+        Resolve(setExpression.value);
+        Resolve(setExpression.objectSyntax);
+
+        return null;
+    }
+
     public object? VisitExpressionStatementSyntax(ExpressionStatementSyntax expressionStatement)
     {
         Resolve(expressionStatement.expression);

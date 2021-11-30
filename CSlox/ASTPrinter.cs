@@ -21,6 +21,8 @@ public class ASTPrinter : IExpressionVisitor
     public object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentExpression) => throw new NotImplementedException();
     public object? VisitLogicalExpressionSyntax(LogicalExpressionSyntax logicalExpression) => throw new NotImplementedException();
     public object? VisitCallExpressionSyntax(CallExpressionSyntax callExpression) => throw new NotImplementedException();
+    public object? VisitGetExpressionSyntax(GetExpressionSyntax getExpression) => throw new NotImplementedException();
+    public object? VisitSetExpressionSyntax(SetExpressionSyntax setExpression) => throw new NotImplementedException();
 
     string parenthesize(string name, params ExpressionSyntax[] expressionSyntaxes)
     {
