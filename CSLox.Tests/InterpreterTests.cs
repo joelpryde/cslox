@@ -219,4 +219,29 @@ counter();");
 }");
         Assert.Equal(@$"global{NL}global{NL}", output);
     }
+    
+    [Fact]
+    public void TestClassDeclarationAndName()
+    {
+        var output = Interpret(
+$@"class DevonshireCream
+{{
+    serveOn()
+    {{
+        return ""Scones"";
+    }}
+}}
+print DevonshireCream;");
+        Assert.Equal(@$"DevonshireCream{NL}", output);
+    }
+    
+    [Fact]
+    public void TestClassInstance()
+    {
+        var output = Interpret(
+$@"class Bagel {{}}
+var bagel = Bagel();
+print bagel;");
+        Assert.Equal(@$"Bagel instance{NL}", output);
+    }
 }

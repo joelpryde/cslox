@@ -210,4 +210,12 @@ class Resolver : IExpressionVisitor, IStatementVisitor
         
         return null;
     }
+
+    public object? VisitClassStatementSyntax(ClassStatementSyntax classStatement)
+    {
+        Declare(classStatement.name);
+        Define(classStatement.name);
+
+        return null;
+    }
 }

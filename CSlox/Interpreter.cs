@@ -222,6 +222,15 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         throw new CallReturnException(value);
     }
 
+    public object? VisitClassStatementSyntax(ClassStatementSyntax classStatement)
+    {
+        _environment.Define(classStatement.name.lexeme, null);
+        var klass = new LoxClass(classStatement.name.lexeme);
+        _environment.Assign(classStatement.name, klass);
+
+        return null;
+    }
+
     internal void ExecuteBlock(List<StatementSyntax> blockStatements, Environment environment)
     {
         var previousEnvironment = _environment;

@@ -56,6 +56,8 @@ internal class Parser
     {
         try
         {
+            if (Match(TokenType.CLASS))
+                return ClassDeclarationRule();
             if (Match(TokenType.FUN))
                 return FunctionDeclarationRule("function");
             if (Match(TokenType.VAR))
@@ -67,6 +69,20 @@ internal class Parser
             SynchronizeError();
             return null;
         }
+    }
+
+    StatementSyntax ClassDeclarationRule()
+    {
+        var name = Consume(TokenType.IDENTIFIER, "Expect class name.");
+        Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
+
+        var methods = new List<StatementSyntax>();
+        while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+            methods.Add(FunctionDeclarationRule("method"));
+
+        Consume(TokenType.RIGHT_BRACE, "Expect '{' after class body.");
+
+        return new ClassStatementSyntax(name, methods);
     }
 
     StatementSyntax FunctionDeclarationRule(string kind)

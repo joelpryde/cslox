@@ -43,7 +43,12 @@ public record FunctionDeclarationStatementSyntax(Token name, List<Token> paramet
 public record ReturnStatementSyntax(Token keywordToken, ExpressionSyntax? valueExpression) : StatementSyntax()
 {
     public override object? Accept(IStatementVisitor visitor) => visitor.VisitReturnStatementSyntax(this);
-} 
+}
+
+public record ClassStatementSyntax(Token name, List<StatementSyntax> methods) : StatementSyntax()
+{
+    public override object? Accept(IStatementVisitor visitor) => visitor.VisitClassStatementSyntax(this);
+}
 
 public interface IStatementVisitor
 {
@@ -55,4 +60,5 @@ public interface IStatementVisitor
     object? VisitWhileStatementSyntax(WhileStatementSyntax whileStatementSyntax);
     object? VisitFunctionDeclarationStatementSyntax(FunctionDeclarationStatementSyntax functionDeclarationStatement);
     object? VisitReturnStatementSyntax(ReturnStatementSyntax returnStatement);
+    object? VisitClassStatementSyntax(ClassStatementSyntax classStatement);
 }
