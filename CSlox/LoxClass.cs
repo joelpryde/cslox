@@ -2,12 +2,14 @@ namespace CSLox;
 
 class LoxClass : ILoxCallable
 {
-    internal string _name;
-    internal readonly Dictionary<string, LoxFunction> _methods;
+    internal readonly string _name;
+    readonly Dictionary<string, LoxFunction> _methods;
+    readonly LoxClass? _superClass;
 
-    public LoxClass(string name, Dictionary<string, LoxFunction> methods)
+    public LoxClass(string name, LoxClass? superClass, Dictionary<string, LoxFunction> methods)
     {
         _name = name;
+        _superClass = superClass;
         _methods = methods;
     }
 
@@ -27,5 +29,11 @@ class LoxClass : ILoxCallable
         return instance;
     }
 
-    public LoxFunction? FindMethod(string name) => _methods.ContainsKey(name) ? _methods[name] : null;
+    public LoxFunction? FindMethod(string name)
+    {
+        if (_methods.ContainsKey(name))
+            return _methods[name];
+        
+        return _superClass?.FindMethod(name);
+    }
 }

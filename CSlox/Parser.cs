@@ -71,6 +71,14 @@ class Parser
     StatementSyntax ClassDeclarationRule()
     {
         var name = Consume(TokenType.IDENTIFIER, "Expect class name.");
+
+        VariableExpressionSyntax? superclass = null;
+        if (Match(TokenType.LESS))
+        {
+            Consume(TokenType.IDENTIFIER, "Expect superclass name.");
+            superclass = new VariableExpressionSyntax(Previous());
+        }
+        
         Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
 
         var methods = new List<FunctionDeclarationStatementSyntax>();
@@ -79,7 +87,7 @@ class Parser
 
         Consume(TokenType.RIGHT_BRACE, "Expect '{' after class body.");
 
-        return new ClassStatementSyntax(name, methods);
+        return new ClassStatementSyntax(name, superclass, methods);
     }
 
     StatementSyntax FunctionDeclarationRule(string kind)

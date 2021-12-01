@@ -258,7 +258,13 @@ class Resolver : IExpressionVisitor, IStatementVisitor
         
         Declare(classStatement.name);
         Define(classStatement.name);
-        
+        if (classStatement.superClass != null)
+        {
+            if (classStatement.name.lexeme == classStatement.superClass.name.lexeme)
+                CSLox.Error(classStatement.superClass.name, "A class cannot inherit from itself.");
+            Resolve(classStatement.superClass);
+        }
+
         BeginScope();
         _scopes.Peek()["this"] = true;
 

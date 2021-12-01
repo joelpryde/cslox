@@ -303,4 +303,43 @@ var bagel = Bagel();
 print bagel.chew;");
         Assert.Equal(@$"chew{NL}", output);
     }
+    
+    [Fact]
+    public void TestClassInheritance()
+    {
+        var output = Interpret(
+$@"class Donut {{
+    cook()
+    {{
+        print ""fry"";
+    }}
+}}
+class BostonCream < Donut {{}}
+var donut = BostonCream();
+donut.cook();");
+        Assert.Equal(@$"fry{NL}", output);
+    }
+    
+    [Fact]
+    public void TestSuperKeyword()
+    {
+        var output = Interpret(
+$@"class Donut {{
+    cook()
+    {{
+        print ""fry"";
+    }}
+}}
+class BostonCream < Donut 
+{{
+    cook()
+    {{
+        print ""boston"";
+        super.cook();
+    }}
+}}
+var donut = BostonCream();
+donut.cook;");
+        Assert.Equal(@$"boston{NL}fry{NL}", output);
+    }
 }

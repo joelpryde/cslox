@@ -253,6 +253,14 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
 
     public object? VisitClassStatementSyntax(ClassStatementSyntax classStatement)
     {
+        object? superclass = null;
+        if (classStatement.superClass != null)
+        {
+            superclass = Evaluate(classStatement.superClass);
+            if (superclass is not LoxClass)
+                throw new RuntimeError(classStatement.superClass.name, "Superclass must be a class.");
+        }
+
         _environment.Define(classStatement.name.lexeme, null);
         var methods = new Dictionary<string, LoxFunction>();
         foreach (var method in classStatement.methods)
@@ -262,7 +270,7 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
             methods[method.name.lexeme] = function;
         }
         
-        var klass = new LoxClass(classStatement.name.lexeme, methods);
+        var klass = new LoxClass(classStatement.name.lexeme, (LoxClass?)superclass, methods);
         _environment.Assign(classStatement.name, klass);
 
         return null;
