@@ -257,7 +257,8 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         var methods = new Dictionary<string, LoxFunction>();
         foreach (var method in classStatement.methods)
         {
-            var function = new LoxFunction(method, _environment);
+            var isInitializer = method.name.lexeme == "init";
+            var function = new LoxFunction(method, _environment, isInitializer);
             methods[method.name.lexeme] = function;
         }
         

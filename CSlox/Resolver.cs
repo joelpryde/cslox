@@ -4,6 +4,7 @@ enum FunctionType
 {
     NONE,
     FUNCTION,
+    INITIALIZER,
     METHOD
 }
 
@@ -239,10 +240,14 @@ class Resolver : IExpressionVisitor, IStatementVisitor
     {
         if (_currentFunctionType == FunctionType.NONE)
             CSLox.Error(returnStatement.keywordToken, "Can't return from top-level code.");
-            
+
         if (returnStatement.valueExpression != null)
+        {
+            if (_currentFunctionType == FunctionType.INITIALIZER)
+                CSLox.Error(returnStatement.keywordToken, "Can't return a value from an initializer.");
             Resolve(returnStatement.valueExpression);
-        
+        }
+
         return null;
     }
 
@@ -256,10 +261,13 @@ class Resolver : IExpressionVisitor, IStatementVisitor
         
         BeginScope();
         _scopes.Peek()["this"] = true;
-        
+
         foreach (var method in classStatement.methods)
-            ResolveFunction(method, FunctionType.METHOD);
-        
+        {
+            var declaration = method.name.lexeme == "init" ? FunctionType.INITIALIZER : FunctionType.METHOD;
+            ResolveFunction(method, declaration);
+        }
+
         EndScope();
 
         _currentClassType = enclosingClassType;

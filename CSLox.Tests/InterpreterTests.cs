@@ -287,4 +287,20 @@ bagel.chew = ""chew"";
 bagel.eat();");
         Assert.Equal(@$"bite chew{NL}", output);
     }
+    
+    [Fact]
+    public void TestClassInitializer()
+    {
+        var output = Interpret(
+$@"class Bagel {{
+    init()
+    {{
+        this.chew = ""chew"";
+        return;
+    }}
+}}
+var bagel = Bagel();
+print bagel.chew;");
+        Assert.Equal(@$"chew{NL}", output);
+    }
 }

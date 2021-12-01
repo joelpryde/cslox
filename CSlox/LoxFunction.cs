@@ -10,11 +10,13 @@ class LoxFunction : ILoxCallable
 {
     readonly FunctionDeclarationStatementSyntax _functionDeclaration;
     readonly Environment _closure;
+    readonly bool _isInitializer; 
 
-    public LoxFunction(FunctionDeclarationStatementSyntax functionDeclaration, Environment closure)
+    public LoxFunction(FunctionDeclarationStatementSyntax functionDeclaration, Environment closure, bool isInitializer = false)
     {
         _functionDeclaration = functionDeclaration;
         _closure = closure;
+        _isInitializer = isInitializer;
     }
 
     public int Arity() => _functionDeclaration.parameters.Count;
@@ -31,10 +33,10 @@ class LoxFunction : ILoxCallable
         }
         catch (CallReturnException returnException)
         {
-            return returnException._returnValue;
+            return _isInitializer ? _closure.GetAt(0, "this") : returnException._returnValue;
         }
-        
-        return null;
+
+        return _isInitializer ? _closure.GetAt(0, "this") : null;
     }
     
     public override string ToString() => $"<fn {_functionDeclaration.name.lexeme}>";

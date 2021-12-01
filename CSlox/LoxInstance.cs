@@ -14,11 +14,9 @@ class LoxInstance
         if (_fields.ContainsKey(name.lexeme))
             return _fields[name.lexeme];
 
-        if (_klass.FindMethod(name.lexeme))
-        {
-            var method = _klass._methods[name.lexeme];
+        var method = _klass.FindMethod(name.lexeme);
+        if (method != null)
             return method.Bind(this);
-        }
 
         throw new RuntimeError(name, $"Undefined property {name.lexeme}.");
     }

@@ -12,13 +12,20 @@ class LoxClass : ILoxCallable
     }
 
     public override string ToString() => _name;
-    public int Arity() => 0;
+    public int Arity()
+    {
+        var initializer = FindMethod("init");
+        return initializer?.Arity() ?? 0;
+    }
 
     public object? Call(Interpreter interpreter, List<object?> arguments)
     {
         var instance = new LoxInstance(this);
+        var initializer = FindMethod("init");
+        initializer?.Bind(instance).Call(interpreter, arguments);
+        
         return instance;
     }
 
-    public bool FindMethod(string name) => _methods.ContainsKey(name);
+    public LoxFunction? FindMethod(string name) => _methods.ContainsKey(name) ? _methods[name] : null;
 }
