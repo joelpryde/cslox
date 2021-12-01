@@ -8,13 +8,13 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
     readonly Environment _globals = new();
     Environment _environment;
     Dictionary<ExpressionSyntax, int> _localsDistance = new();
-    
+
     public Interpreter()
     {
         _environment = _globals;
         _globals.Define("clock", new ClockLoxCallable());
     }
-    
+
     public string Interpret(List<StatementSyntax> statements)
     {
         try
@@ -41,7 +41,7 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
     public object? VisitLiteralExpressionSyntax(LiteralExpressionSyntax literalExpressionSyntax) => literalExpressionSyntax.literalValue;
 
     public object? VisitGroupingExpressionSyntax(GroupingExpressionSyntax groupingExpressionSyntax) => Evaluate(groupingExpressionSyntax);
-    
+
     public object? VisitUnaryExpressionSyntax(UnaryExpressionSyntax unaryExpressionSyntax)
     {
         var rightObject = Evaluate(unaryExpressionSyntax.rightExpression);
@@ -64,19 +64,19 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
     {
         if (_localsDistance.ContainsKey(expression))
             return _environment.GetAt(_localsDistance[expression], name.lexeme);
-        
+
         return _globals.Get(name);
     }
 
     public object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentExpression)
     {
         var value = Evaluate(assignmentExpression.value);
-        
+
         if (_localsDistance.ContainsKey(assignmentExpression))
             _environment.AssignAt(_localsDistance[assignmentExpression], assignmentExpression.name, value);
         else
             _globals.Assign(assignmentExpression.name, value);
-        
+
         return value;
     }
 
@@ -104,7 +104,7 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         var arguments = callExpression.arguments.Select(Evaluate);
         if (callee == null) throw new InvalidOperationException();
         var function = (ILoxCallable)callee;
-        
+
         return function.Call(this, arguments.ToList());
     }
 
@@ -115,13 +115,12 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
             return instance.Get(getExpression.name);
 
         throw new RuntimeError(getExpression.name, "Only instances have properties.");
-
     }
 
     public object? VisitSetExpressionSyntax(SetExpressionSyntax setExpression)
     {
         var objectInstance = Evaluate(setExpression.objectSyntax);
-        
+
         if (objectInstance is LoxInstance loxInstance)
         {
             var objectValue = Evaluate(setExpression.value);
@@ -137,12 +136,24 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         return LookupVariable(thisExpression.keyword, thisExpression);
     }
 
+    public object? VisitSuperExpressionSyntax(SuperExpressionSyntax superExpression)
+    {
+        var distance = _localsDistance[superExpression];
+        var superclass = (LoxClass)_environment.GetAt(distance, "super");
+        var thisObject = (LoxInstance)_environment.GetAt(distance - 1, "this");
+        var method = superclass.FindMethod(superExpression.method.lexeme);
+        if (method == null)
+            throw new RuntimeError(superExpression.method, $"Undefined property {superExpression.method.lexeme}.");
+        
+        return method.Bind(thisObject);
+    }
+
     bool IsTruthy(object? testObject)
     {
         return testObject switch
         {
             null => false,
-            bool boolValue => boolValue, 
+            bool boolValue => boolValue,
             _ => true
         };
     }
@@ -173,7 +184,7 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
             TokenType.SLASH => (double)leftObject / (double)rightObject,
             TokenType.STAR when leftObject is not double || rightObject is not double => throw GenerateInvalidBinaryOperandsError(binaryExpressionSyntax),
             TokenType.STAR => (double)leftObject * (double)rightObject,
-            
+
             _ => throw new InvalidOperationException()
         };
     }
@@ -189,7 +200,7 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
     }
 
     object? Evaluate(ExpressionSyntax expressionSyntax) => expressionSyntax.Accept(this);
-    
+
     public object? VisitExpressionStatementSyntax(ExpressionStatementSyntax expressionStatement)
     {
         Evaluate(expressionStatement.expression);
@@ -208,7 +219,7 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         object? value = null;
         if (variableDeclarationStatement.initializer != null)
             value = Evaluate(variableDeclarationStatement.initializer);
-        
+
         _environment.Define(variableDeclarationStatement.name.lexeme, value);
         return null;
     }
@@ -247,7 +258,7 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         object? value = null;
         if (returnStatement.valueExpression != null)
             value = Evaluate(returnStatement.valueExpression);
-        
+
         throw new CallReturnException(value);
     }
 
@@ -262,6 +273,13 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         }
 
         _environment.Define(classStatement.name.lexeme, null);
+
+        if (classStatement.superClass != null)
+        {
+            _environment = new Environment(_environment);
+            _environment.Define("super", superclass);
+        }
+
         var methods = new Dictionary<string, LoxFunction>();
         foreach (var method in classStatement.methods)
         {
@@ -269,8 +287,10 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
             var function = new LoxFunction(method, _environment, isInitializer);
             methods[method.name.lexeme] = function;
         }
-        
+
         var klass = new LoxClass(classStatement.name.lexeme, (LoxClass?)superclass, methods);
+        if (superclass != null)
+            _environment = _environment._enclosing;
         _environment.Assign(classStatement.name, klass);
 
         return null;
@@ -315,13 +335,13 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
 class CallReturnException : Exception
 {
     internal readonly object? _returnValue;
-    
+
     public CallReturnException(object? returnValue) => _returnValue = returnValue;
 }
 
 public class RuntimeError : Exception
 {
     internal Token _token;
-    
+
     public RuntimeError(Token token, string message) : base(message) => _token = token;
 }

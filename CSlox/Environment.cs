@@ -2,7 +2,7 @@ namespace CSLox;
 
 class Environment
 {
-    Environment? _enclosing = null;
+    internal Environment? _enclosing = null;
     Dictionary<string, object?> _values = new();
 
     public Environment() {}

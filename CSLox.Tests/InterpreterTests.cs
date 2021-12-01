@@ -12,10 +12,10 @@ public class InterpreterTests
 
         public void ConsoleWriteLine(string output)
         {
-            _output += output + NL;   
+            _output += output + NL;
         }
     }
-    
+
     string Interpret(string source)
     {
         var testConsoleWriter = new TestcConsoleWriter();
@@ -23,13 +23,13 @@ public class InterpreterTests
 
         var scanner = new Scanner(source);
         var tokens = scanner.scanTokens();
-        
+
         var parser = new Parser(tokens);
         var statements = parser.Parse();
-        
+
         var interpreter = new Interpreter();
         var resolver = new Resolver(interpreter);
-        
+
         resolver.Resolve(statements);
         interpreter.Interpret(statements);
         return testConsoleWriter._output;
@@ -41,12 +41,12 @@ public class InterpreterTests
         var output = Interpret("print -10 * 2;");
         Assert.Equal($"-20{NL}", output);
     }
-    
+
     [Fact]
     public void TestInterpretGroupingOfAssigments()
     {
         var output = Interpret(
-@"var a = ""global a"";
+            @"var a = ""global a"";
 var b = ""global b"";
 var c = ""global c"";
 {
@@ -66,7 +66,7 @@ print a;
 print b;
 print c;""");
         Assert.Equal(
-@"inner a
+            @"inner a
 outer b
 global c
 outer a
@@ -74,15 +74,15 @@ outer b
 global c
 global a
 global b
-global c" + NL, 
+global c" + NL,
             output);
     }
-    
+
     [Fact]
     public void TestBasicBranching()
     {
         var output = Interpret(
-@"var yes = true;
+            @"var yes = true;
 var no = false;
 if (yes)
     print ""yes is true"";
@@ -93,15 +93,15 @@ if (no)
 else
     print ""else no is not true"";");
         Assert.Equal(
-@$"yes is true
+            @$"yes is true
 else no is not true" + NL, output);
     }
-    
+
     [Fact]
     public void TestBranchingWithLogicalOperators()
     {
         var output = Interpret(
-@"var yes = true;
+            @"var yes = true;
 var no = false;
 if (yes and no)
     print ""yes and no are true"";
@@ -112,15 +112,15 @@ if (yes or no)
 else
     print ""yes or no are not true"";");
         Assert.Equal(
-@$"yes and no are not true
+            @$"yes and no are not true
 yes or no are true" + NL, output);
     }
-    
+
     [Fact]
     public void TestWhileLoop()
     {
         var output = Interpret(
-@"var i = 0;
+            @"var i = 0;
 var x = 0;
 while (i < 10)
 {
@@ -130,12 +130,12 @@ while (i < 10)
 print x;");
         Assert.Equal(@$"10" + NL, output);
     }
-    
+
     [Fact]
     public void TestForLoop()
     {
         var output = Interpret(
-@"var x = 0;
+            @"var x = 0;
 for (var i = 0; i < 10; i = i + 1)
 {
     x = x + 1;
@@ -143,36 +143,36 @@ for (var i = 0; i < 10; i = i + 1)
 print x;");
         Assert.Equal(@$"10" + NL, output);
     }
-    
+
     [Fact]
     public void TestBasicFunctionInvocation()
     {
         var output = Interpret(
-@"fun sayHi(first, last)
+            @"fun sayHi(first, last)
 { 
     print ""Hi "" + first + "" "" + last;
 }
 sayHi(""L33t"", ""Hax0r"");");
         Assert.Equal(@$"Hi L33t Hax0r" + NL, output);
     }
-    
+
     [Fact]
     public void TestFunctionReturningValue()
     {
         var output = Interpret(
-@"fun someValue()
+            @"fun someValue()
 { 
     return 3;
 }
 print someValue();");
         Assert.Equal(@$"3" + NL, output);
     }
-    
+
     [Fact]
     public void TestFunctionWithBasicRecursion()
     {
         var output = Interpret(
-@"fun someValue(x)
+            @"fun someValue(x)
 {
     if (x > 3)
         return 0;
@@ -182,12 +182,12 @@ print someValue();");
 print someValue(0);");
         Assert.Equal(@$"6" + NL, output);
     }
-    
+
     [Fact]
     public void TestFunctionWithClosure()
     {
         var output = Interpret(
-@"fun makeCounter()
+            @"fun makeCounter()
 {
     var i = 0;
     fun count()
@@ -202,12 +202,12 @@ counter();
 counter();");
         Assert.Equal(@$"1{NL}2{NL}", output);
     }
-    
+
     [Fact]
     public void TestCorrectVariableBindingInScopes()
     {
         var output = Interpret(
-@"var a = ""global"";
+            @"var a = ""global"";
 {
     fun showA()
     {
@@ -219,12 +219,12 @@ counter();");
 }");
         Assert.Equal(@$"global{NL}global{NL}", output);
     }
-    
+
     [Fact]
     public void TestClassDeclarationAndName()
     {
         var output = Interpret(
-$@"class DevonshireCream
+            $@"class DevonshireCream
 {{
     serveOn()
     {{
@@ -234,33 +234,33 @@ $@"class DevonshireCream
 print DevonshireCream;");
         Assert.Equal(@$"DevonshireCream{NL}", output);
     }
-    
+
     [Fact]
     public void TestClassInstance()
     {
         var output = Interpret(
-$@"class Bagel {{}}
+            $@"class Bagel {{}}
 var bagel = Bagel();
 print bagel;");
         Assert.Equal(@$"Bagel instance{NL}", output);
     }
-    
+
     [Fact]
     public void TestClassInstanceProperties()
     {
         var output = Interpret(
-$@"class Bagel {{}}
+            $@"class Bagel {{}}
 var bagel = Bagel();
 bagel.thing = ""thing"";
 print bagel.thing;");
         Assert.Equal(@$"thing{NL}", output);
     }
-    
+
     [Fact]
     public void TestClassMethodCall()
     {
         var output = Interpret(
-$@"class Bagel {{
+            $@"class Bagel {{
     eat()
     {{
         print ""chew chew"";
@@ -270,12 +270,12 @@ var bagel = Bagel();
 bagel.eat();");
         Assert.Equal(@$"chew chew{NL}", output);
     }
-    
+
     [Fact]
     public void TestUseOfThisInClass()
     {
         var output = Interpret(
-$@"class Bagel {{
+            $@"class Bagel {{
     eat()
     {{
         var bite = ""bite"";
@@ -287,12 +287,12 @@ bagel.chew = ""chew"";
 bagel.eat();");
         Assert.Equal(@$"bite chew{NL}", output);
     }
-    
+
     [Fact]
     public void TestClassInitializer()
     {
         var output = Interpret(
-$@"class Bagel {{
+            $@"class Bagel {{
     init()
     {{
         this.chew = ""chew"";
@@ -303,12 +303,12 @@ var bagel = Bagel();
 print bagel.chew;");
         Assert.Equal(@$"chew{NL}", output);
     }
-    
+
     [Fact]
     public void TestClassInheritance()
     {
         var output = Interpret(
-$@"class Donut {{
+            $@"class Donut {{
     cook()
     {{
         print ""fry"";
@@ -319,12 +319,12 @@ var donut = BostonCream();
 donut.cook();");
         Assert.Equal(@$"fry{NL}", output);
     }
-    
+
     [Fact]
     public void TestSuperKeyword()
     {
         var output = Interpret(
-$@"class Donut {{
+            $@"class Donut {{
     cook()
     {{
         print ""fry"";
@@ -339,7 +339,7 @@ class BostonCream < Donut
     }}
 }}
 var donut = BostonCream();
-donut.cook;");
+donut.cook();");
         Assert.Equal(@$"boston{NL}fry{NL}", output);
     }
 }

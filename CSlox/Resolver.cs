@@ -11,7 +11,8 @@ enum FunctionType
 enum ClassType
 {
     NONE,
-    CLASS
+    CLASS,
+    SUBCLASS
 }
 
 class Resolver : IExpressionVisitor, IStatementVisitor
@@ -176,6 +177,17 @@ class Resolver : IExpressionVisitor, IStatementVisitor
         return null;
     }
 
+    public object? VisitSuperExpressionSyntax(SuperExpressionSyntax superExpression)
+    {
+        if (_currentClassType == ClassType.NONE)
+            CSLox.Error(superExpression.keyword, "Cannot use 'super' outside of a class.");
+        if (_currentClassType != ClassType.SUBCLASS)
+            CSLox.Error(superExpression.keyword, "Cannot use 'super' in a class with no superclass.");
+        ResolveLocal(superExpression, superExpression.keyword);
+
+        return null;
+    }
+
     public object? VisitExpressionStatementSyntax(ExpressionStatementSyntax expressionStatement)
     {
         Resolve(expressionStatement.expression);
@@ -254,7 +266,7 @@ class Resolver : IExpressionVisitor, IStatementVisitor
     public object? VisitClassStatementSyntax(ClassStatementSyntax classStatement)
     {
         var enclosingClassType = _currentClassType;
-        _currentClassType = ClassType.CLASS;
+        _currentClassType = classStatement.superClass != null ? ClassType.SUBCLASS : ClassType.CLASS;
         
         Declare(classStatement.name);
         Define(classStatement.name);
@@ -265,6 +277,11 @@ class Resolver : IExpressionVisitor, IStatementVisitor
             Resolve(classStatement.superClass);
         }
 
+        if (classStatement.superClass != null)
+        {
+            BeginScope();
+            _scopes.Peek()["super"] = true;
+        }
         BeginScope();
         _scopes.Peek()["this"] = true;
 
@@ -276,6 +293,8 @@ class Resolver : IExpressionVisitor, IStatementVisitor
 
         EndScope();
 
+        if (classStatement.superClass != null)
+            EndScope();
         _currentClassType = enclosingClassType;
         return null;
     }

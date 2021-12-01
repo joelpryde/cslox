@@ -409,6 +409,14 @@ class Parser
         if (Match(TokenType.NUMBER, TokenType.STRING))
             return new LiteralExpressionSyntax(Previous().literal);
 
+        if (Match(TokenType.SUPER))
+        {
+            var keyword = Previous();
+            Consume(TokenType.DOT, "Expect '.' after 'super'.");
+            var method = Consume(TokenType.IDENTIFIER, "Expect superclass method name.");
+            return new SuperExpressionSyntax(keyword, method);
+        }
+
         if (Match(TokenType.THIS))
             return new ThisExpressionSyntax(Previous());
 
