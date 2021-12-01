@@ -60,12 +60,12 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         return LookupVariable(variableExpressionSyntax.name, variableExpressionSyntax);
     }
 
-    object? LookupVariable(Token name, VariableExpressionSyntax expression)
+    object? LookupVariable(Token name, ExpressionSyntax expression)
     {
         if (_localsDistance.ContainsKey(expression))
             return _environment.GetAt(_localsDistance[expression], name.lexeme);
         
-        return _globals.Get(expression.name);
+        return _globals.Get(name);
     }
 
     public object? VisitAssignmentExpressionSyntax(AssignmentExpressionSyntax assignmentExpression)
@@ -130,6 +130,11 @@ class Interpreter : IExpressionVisitor, IStatementVisitor
         }
 
         throw new RuntimeError(setExpression.name, "Only instances have fields.");
+    }
+
+    public object? VisitThisExpressionSyntax(ThisExpressionSyntax thisExpression)
+    {
+        return LookupVariable(thisExpression.keyword, thisExpression);
     }
 
     bool IsTruthy(object? testObject)

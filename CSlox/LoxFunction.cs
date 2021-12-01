@@ -38,6 +38,13 @@ class LoxFunction : ILoxCallable
     }
     
     public override string ToString() => $"<fn {_functionDeclaration.name.lexeme}>";
+
+    public LoxFunction Bind(LoxInstance instance)
+    {
+        var environment = new Environment(_closure);
+        environment.Define("this", instance);
+        return new LoxFunction(_functionDeclaration, environment);
+    }
 }
 
 class ClockLoxCallable : ILoxCallable

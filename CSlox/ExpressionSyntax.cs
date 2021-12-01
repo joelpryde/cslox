@@ -55,6 +55,11 @@ public record SetExpressionSyntax(ExpressionSyntax objectSyntax, Token name, Exp
     public override object? Accept(IExpressionVisitor visitor) => visitor.VisitSetExpressionSyntax(this);
 }
 
+public record ThisExpressionSyntax(Token keyword) : ExpressionSyntax()
+{
+    public override object? Accept(IExpressionVisitor visitor) => visitor.VisitThisExpressionSyntax(this);
+}
+
 
 public interface IExpressionVisitor
 {
@@ -68,4 +73,5 @@ public interface IExpressionVisitor
     object? VisitCallExpressionSyntax(CallExpressionSyntax callExpression);
     object? VisitGetExpressionSyntax(GetExpressionSyntax getExpression);
     object? VisitSetExpressionSyntax(SetExpressionSyntax setExpression);
+    object? VisitThisExpressionSyntax(ThisExpressionSyntax thisExpression);
 }

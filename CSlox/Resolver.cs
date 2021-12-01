@@ -2,16 +2,23 @@ namespace CSLox;
 
 enum FunctionType
 {
-    None,
-    Function,
+    NONE,
+    FUNCTION,
     METHOD
+}
+
+enum ClassType
+{
+    NONE,
+    CLASS
 }
 
 class Resolver : IExpressionVisitor, IStatementVisitor
 {
     readonly Interpreter _interpreter;
     readonly Stack<Dictionary<string, bool>> _scopes = new();
-    FunctionType _currentFunctionType = FunctionType.None;
+    FunctionType _currentFunctionType = FunctionType.NONE;
+    ClassType _currentClassType = ClassType.NONE;
 
     public Resolver(Interpreter interpreter) => _interpreter = interpreter;
 
@@ -156,6 +163,18 @@ class Resolver : IExpressionVisitor, IStatementVisitor
         return null;
     }
 
+    public object? VisitThisExpressionSyntax(ThisExpressionSyntax thisExpression)
+    {
+        if (_currentClassType == ClassType.NONE)
+        {
+            CSLox.Error(thisExpression.keyword, "Can't use 'this' outside of class.");
+            return null;
+        }
+        ResolveLocal(thisExpression, thisExpression.keyword);
+
+        return null;
+    }
+
     public object? VisitExpressionStatementSyntax(ExpressionStatementSyntax expressionStatement)
     {
         Resolve(expressionStatement.expression);
@@ -211,14 +230,14 @@ class Resolver : IExpressionVisitor, IStatementVisitor
     {
         Declare(functionDeclarationStatement.name);
         Define(functionDeclarationStatement.name);
-        ResolveFunction(functionDeclarationStatement, FunctionType.Function);
+        ResolveFunction(functionDeclarationStatement, FunctionType.FUNCTION);
         
         return null;
     }
 
     public object? VisitReturnStatementSyntax(ReturnStatementSyntax returnStatement)
     {
-        if (_currentFunctionType == FunctionType.None)
+        if (_currentFunctionType == FunctionType.NONE)
             CSLox.Error(returnStatement.keywordToken, "Can't return from top-level code.");
             
         if (returnStatement.valueExpression != null)
@@ -229,12 +248,21 @@ class Resolver : IExpressionVisitor, IStatementVisitor
 
     public object? VisitClassStatementSyntax(ClassStatementSyntax classStatement)
     {
+        var enclosingClassType = _currentClassType;
+        _currentClassType = ClassType.CLASS;
+        
         Declare(classStatement.name);
         Define(classStatement.name);
         
+        BeginScope();
+        _scopes.Peek()["this"] = true;
+        
         foreach (var method in classStatement.methods)
             ResolveFunction(method, FunctionType.METHOD);
+        
+        EndScope();
 
+        _currentClassType = enclosingClassType;
         return null;
     }
 }

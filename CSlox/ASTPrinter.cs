@@ -23,6 +23,7 @@ public class ASTPrinter : IExpressionVisitor
     public object? VisitCallExpressionSyntax(CallExpressionSyntax callExpression) => throw new NotImplementedException();
     public object? VisitGetExpressionSyntax(GetExpressionSyntax getExpression) => throw new NotImplementedException();
     public object? VisitSetExpressionSyntax(SetExpressionSyntax setExpression) => throw new NotImplementedException();
+    public object? VisitThisExpressionSyntax(ThisExpressionSyntax thisExpression) => throw new NotImplementedException();
 
     string parenthesize(string name, params ExpressionSyntax[] expressionSyntaxes)
     {

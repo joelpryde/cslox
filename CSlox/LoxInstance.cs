@@ -15,7 +15,10 @@ class LoxInstance
             return _fields[name.lexeme];
 
         if (_klass.FindMethod(name.lexeme))
-            return _klass._methods[name.lexeme];
+        {
+            var method = _klass._methods[name.lexeme];
+            return method.Bind(this);
+        }
 
         throw new RuntimeError(name, $"Undefined property {name.lexeme}.");
     }

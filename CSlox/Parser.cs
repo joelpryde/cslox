@@ -401,6 +401,9 @@ class Parser
         if (Match(TokenType.NUMBER, TokenType.STRING))
             return new LiteralExpressionSyntax(Previous().literal);
 
+        if (Match(TokenType.THIS))
+            return new ThisExpressionSyntax(Previous());
+
         if (Match(TokenType.IDENTIFIER))
             return new VariableExpressionSyntax(Previous());
 

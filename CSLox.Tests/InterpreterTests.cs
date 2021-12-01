@@ -270,4 +270,21 @@ var bagel = Bagel();
 bagel.eat();");
         Assert.Equal(@$"chew chew{NL}", output);
     }
+    
+    [Fact]
+    public void TestUseOfThisInClass()
+    {
+        var output = Interpret(
+$@"class Bagel {{
+    eat()
+    {{
+        var bite = ""bite"";
+        print bite + "" "" + this.chew;
+    }}
+}}
+var bagel = Bagel();
+bagel.chew = ""chew"";
+bagel.eat();");
+        Assert.Equal(@$"bite chew{NL}", output);
+    }
 }
